@@ -1,5 +1,5 @@
 // ─── SkillForge AI Frontend API Client ────────────────────────────────────────────
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = 'https://skillforge-ai-three.vercel.app/';
 
 function getToken() {
   try {
