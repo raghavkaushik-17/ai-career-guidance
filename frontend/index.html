@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>SkillForge AI — Your AI Career Companion</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<!-- ─── LANDING PAGE ─────────────────────────────────────────────────────── -->
+<div id="landing-screen">
+
+  <nav class="land-nav">
+    <div class="land-logo">
+      <img src="skillforge-icon.svg" style="width:36px;height:28px"/>
+      <span>SkillForge AI</span>
+    </div>
+    <div class="land-nav-links">
+      <a href="#features" class="land-nav-link">Features</a>
+      <a href="#how" class="land-nav-link">How it works</a>
+      <button class="land-btn-ghost" onclick="showLandingAuth('login')">Sign In</button>
+      <button class="land-btn-primary" onclick="showLandingAuth('signup')">Get Started Free</button>
+    </div>
+    <button class="land-hamburger" id="land-hamburger" onclick="toggleLandingMenu()">☰</button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="land-mobile-menu" id="land-mobile-menu">
+    <a href="#features" class="land-nav-link" onclick="toggleLandingMenu()">Features</a>
+    <a href="#how" class="land-nav-link" onclick="toggleLandingMenu()">How it works</a>
+    <button class="land-btn-ghost" onclick="showLandingAuth('login')">Sign In</button>
+    <button class="land-btn-primary" onclick="showLandingAuth('signup')">Get Started Free</button>
+  </div>
+
+  <!-- Hero -->
+  <section class="land-hero">
+    <div class="land-hero-bg">
+      <div class="land-orb land-orb1"></div>
+      <div class="land-orb land-orb2"></div>
+      <div class="land-orb land-orb3"></div>
+      <div class="land-grid"></div>
+    </div>
+    <div class="land-hero-content">
+      <div class="land-badge">✦ AI-Powered Career Intelligence</div>
+      <h1 class="land-heading">
+        Your career,<br>
+        <span class="land-heading-accent">guided by AI.</span>
+      </h1>
+      <p class="land-subheading">
+        Discover your skill gaps, match with dream jobs, chat with an AI advisor,<br class="land-br">
+        and book expert mentors — all in one place.
+      </p>
+      <div class="land-cta-row">
+        <button class="land-btn-hero" onclick="showLandingAuth('signup')">
+          Start For Free
+          <span class="land-btn-arrow">→</span>
+        </button>
+        <button class="land-btn-outline" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+          See how it works
+        </button>
+      </div>
+      <div class="land-social-proof">
+        <div class="land-avatars">
+          <div class="land-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">R</div>
+          <div class="land-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">P</div>
+          <div class="land-av" style="background:linear-gradient(135deg,#10b981,#059669)">A</div>
+          <div class="land-av" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">S</div>
+        </div>
+        <span class="land-proof-text">Join <strong>2,400+</strong> professionals growing their careers</span>
+      </div>
+    </div>
+    <div class="land-hero-visual">
+      <div class="land-card-float land-card-float1">
+        <span style="font-size:20px">🎯</span>
+        <div>
+          <div class="land-card-float-title">Skill Match</div>
+          <div class="land-card-float-val" style="color:var(--land-green)">87% Ready</div>
+        </div>
+      </div>
+      <div class="land-card-float land-card-float2">
+        <span style="font-size:20px">💼</span>
+        <div>
+          <div class="land-card-float-title">Jobs Found</div>
+          <div class="land-card-float-val">24 Matches</div>
+        </div>
+      </div>
+      <div class="land-card-float land-card-float3">
+        <span style="font-size:20px">🎓</span>
+        <div>
+          <div class="land-card-float-title">Mentor Session</div>
+          <div class="land-card-float-val" style="color:var(--land-amber)">Booked ✓</div>
+        </div>
+      </div>
+      <div class="land-mockup">
+        <div class="land-mockup-bar">
+          <span class="land-dot" style="background:#ff5f57"></span>
+          <span class="land-dot" style="background:#febc2e"></span>
+          <span class="land-dot" style="background:#28c840"></span>
+          <span style="flex:1;text-align:center;font-size:11px;color:#888">SkillForge AI Dashboard</span>
+        </div>
+        <div class="land-mockup-body">
+          <div class="land-mockup-msg land-mockup-msg-ai">
+            <span class="land-mockup-av">🧭</span>
+            <div class="land-mockup-bubble">Hi! I analyzed your profile. You're <strong>78% ready</strong> for a Senior Developer role. Want to see your roadmap?</div>
+          </div>
+          <div class="land-mockup-msg land-mockup-msg-user">
+            <div class="land-mockup-bubble land-mockup-bubble-user">Yes, show me what I need to learn!</div>
+          </div>
+          <div class="land-mockup-msg land-mockup-msg-ai">
+            <span class="land-mockup-av">🧭</span>
+            <div class="land-mockup-bubble">
+              <div class="land-mockup-typing">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="land-section" id="features">
+    <div class="land-section-inner">
+      <div class="land-section-label">✦ Everything you need</div>
+      <h2 class="land-section-heading">Your complete career toolkit</h2>
+      <div class="land-features-grid">
+        <div class="land-feature-card" onclick="openFeature('chat')" style="cursor:pointer">
+          <div class="land-feature-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">💬</div>
+          <h3 class="land-feature-title">AI Career Advisor</h3>
+          <p class="land-feature-desc">Chat with an AI trained on career data. Get advice on resumes, interviews, salary negotiation, and career pivots — 24/7.</p>
+        </div>
+        <div class="land-feature-card" onclick="openFeature('skills')" style="cursor:pointer">
+          <div class="land-feature-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">📊</div>
+          <h3 class="land-feature-title">Skill Gap Analysis</h3>
+          <p class="land-feature-desc">See exactly what skills you're missing for your dream role. Get a personalized learning roadmap with curated resources.</p>
+        </div>
+        <div class="land-feature-card" onclick="openFeature('jobs')" style="cursor:pointer">
+          <div class="land-feature-icon" style="background:linear-gradient(135deg,#10b981,#059669)">💼</div>
+          <h3 class="land-feature-title">Smart Job Matching</h3>
+          <p class="land-feature-desc">AI matches you with jobs based on your skills, experience, and goals — across any industry, anywhere in the world.</p>
+        </div>
+        <div class="land-feature-card" onclick="openFeature('mentor')" style="cursor:pointer">
+          <div class="land-feature-icon" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">🎓</div>
+          <h3 class="land-feature-title">1-on-1 Mentorship</h3>
+          <p class="land-feature-desc">Book a session with a senior industry mentor for ₹500. Get a resume review, mock interview, and personalized career roadmap.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="land-section land-section-dark" id="how">
+    <div class="land-section-inner">
+      <div class="land-section-label">✦ Simple process</div>
+      <h2 class="land-section-heading">Up and running in minutes</h2>
+      <div class="land-steps">
+        <div class="land-step">
+          <div class="land-step-num">01</div>
+          <div class="land-step-content">
+            <h3>Create your profile</h3>
+            <p>Sign up free and tell us about your current role, skills, and where you want to go.</p>
+          </div>
+        </div>
+        <div class="land-step-divider">→</div>
+        <div class="land-step">
+          <div class="land-step-num">02</div>
+          <div class="land-step-content">
+            <h3>Get your analysis</h3>
+            <p>Our AI instantly analyzes your skill gaps and matches you with relevant opportunities.</p>
+          </div>
+        </div>
+        <div class="land-step-divider">→</div>
+        <div class="land-step">
+          <div class="land-step-num">03</div>
+          <div class="land-step-content">
+            <h3>Take action</h3>
+            <p>Chat with the AI, apply to jobs, or book a mentor. Your dream career is closer than you think.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="land-section land-cta-section">
+    <div class="land-cta-inner">
+      <div class="land-orb land-orb-cta"></div>
+      <h2 class="land-cta-heading">Ready to accelerate<br>your career?</h2>
+      <p class="land-cta-sub">Free to start. No credit card required.</p>
+      <button class="land-btn-hero" onclick="showLandingAuth('signup')">
+        Get Started Free <span class="land-btn-arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="land-footer">
+    <div class="land-footer-inner">
+      <p class="land-footer-equal">SkillForge AI is an Equal Opportunity Platform: Minority / Women / Disability / Veteran / Gender Identity / Sexual Orientation / Age.</p>
+      <div class="land-footer-links-row">
+        <a class="land-footer-link" href="#" onclick="showFooterModal('privacy')">Privacy</a>
+        <a class="land-footer-link" href="mailto:support@skillforgeai.com">Contact</a>
+        <a class="land-footer-link" href="#" onclick="showFooterModal('terms')">Terms</a>
+      </div>
+      <div class="land-footer-text">© 2026 SkillForge AI, Inc. or its affiliates. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- Footer Modals -->
+  <div id="footer-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeFooterModal()">
+    <div style="background:#111118;border:1px solid #ffffff20;border-radius:16px;max-width:560px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #ffffff12">
+        <h3 id="footer-modal-title" style="font-size:17px;font-weight:700;color:#f0f0f8"></h3>
+        <button onclick="closeFooterModal()" style="background:none;border:none;color:#9090a8;font-size:20px;cursor:pointer;line-height:1">✕</button>
+      </div>
+      <div id="footer-modal-body" style="padding:24px;overflow-y:auto;font-size:14px;line-height:1.8;color:#9090a8"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── AUTH SCREEN ─────────────────────────────────────────────────────── -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-bg"></div>
+  <div class="auth-card">
+    <div class="auth-logo" onclick="goToLandingFromAuth()" style="cursor:pointer;user-select:none" title="Back to home">
+      <img src="skillforge-icon.svg" style="width:44px;height:35px"/>
+      <span class="auth-logo-text">SkillForge AI</span>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Sign in to your career dashboard</p>
+      <div class="auth-error" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="login-email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="login-password" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-primary btn-full" id="login-btn" style="margin-top:8px">
+        Sign In
+      </button>
+      <div class="auth-toggle">
+        Don't have an account?
+        <button id="go-signup-btn" style="background:none;border:none;color:var(--accent2);cursor:pointer;font-size:13px;font-weight:600;padding:0;text-decoration:underline;vertical-align:baseline">Sign up free</button>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signup-form" style="display:none">
+      <h1 class="auth-title">Start your journey</h1>
+      <p class="auth-subtitle">Create your free SkillForge AI account</p>
+      <div class="auth-error" id="signup-error"></div>
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" class="form-input" id="signup-name" placeholder="Alex Johnson" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input type="email" class="form-input" id="signup-email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <input type="password" class="form-input" id="signup-password" placeholder="Min. 8 characters" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Country *</label>
+        <select class="form-input form-select" id="signup-country" onchange="updateStates()">
+          <option value="">Select country...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">State / Province *</label>
+        <select class="form-input form-select" id="signup-state">
+          <option value="">Select country first...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number <span style="color:var(--text3);font-weight:400">(optional)</span></label>
+        <div style="display:flex;gap:8px">
+          <select class="form-input form-select" id="signup-dialcode" style="width:140px;flex-shrink:0;font-size:13px">
+            <option value="">Code</option>
+          </select>
+          <input type="tel" class="form-input" id="signup-phone" placeholder="Enter phone number" style="flex:1" />
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" id="signup-btn" style="margin-top:8px">
+        Create Account
+      </button>
+      <div class="auth-toggle">
+        Already have an account?
+        <button id="go-login-btn" style="background:none;border:none;color:var(--accent2);cursor:pointer;font-size:13px;font-weight:600;padding:0;text-decoration:underline;vertical-align:baseline">Sign in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MAIN APP ─────────────────────────────────────────────────────────── -->
+<div id="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header" onclick="goToLanding()" style="cursor:pointer;user-select:none" title="Back to home">
+      <img src="skillforge-icon.svg" style="width:40px;height:32px"/>
+      <span class="logo-text">SkillForge AI</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-title">Navigation</div>
+      <button class="nav-item active" data-page="chat">
+        <span class="icon">💬</span> AI Advisor
+      </button>
+      <button class="nav-item" data-page="jobs">
+        <span class="icon">💼</span> Job Matches
+      </button>
+      <button class="nav-item" data-page="skills">
+        <span class="icon">📊</span> Skill Gap
+      </button>
+      <button class="nav-item" data-page="mentor">
+        <span class="icon">🎓</span> Mentorship
+      </button>
+      <button class="nav-item" data-page="profile">
+        <span class="icon">👤</span> Profile
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card" onclick="navigateTo('profile')">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-name">Loading...</div>
+          <div class="user-role" id="sidebar-role">—</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm btn-full mt-2" onclick="signOut()" style="justify-content:center">
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ── CHAT PAGE ────────────────────────────────────────────────────── -->
+    <div class="page active" id="page-chat">
+      <div class="chat-layout">
+        <!-- Chat sidebar -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">
+            <span style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em">History</span>
+          </div>
+          <div class="chat-sessions" id="chat-sessions-list">
+            <div class="text-sm text-muted" style="padding:12px 8px">Loading conversations...</div>
+          </div>
+        </div>
+
+        <!-- Chat main -->
+        <div class="chat-main">
+          <!-- Topbar with sidebar toggle -->
+          <div class="chat-topbar">
+            <button id="chat-sidebar-toggle-btn" class="btn btn-ghost btn-icon btn-sm" title="Toggle history" style="flex-shrink:0">☰</button>
+            <span style="font-size:13px;color:var(--text2);font-weight:500">AI Career Advisor</span>
+            <button class="btn btn-primary btn-sm" onclick="createNewChat()" style="margin-left:auto;flex-shrink:0">+ New Chat</button>
+          </div>
+          <!-- Welcome screen -->
+          <div class="chat-welcome" id="chat-welcome">
+            <div class="chat-welcome-icon">🧭</div>
+            <h2 class="chat-welcome-title">Your AI Career Advisor</h2>
+            <p class="chat-welcome-subtitle">I'm here to help you navigate your career journey. Ask me anything about jobs, skills, interviews, or career paths.</p>
+            <div class="chat-prompts">
+              <div class="chat-prompt-chip" onclick="sendPrompt(this.textContent)">How do I transition into tech?</div>
+              <div class="chat-prompt-chip" onclick="sendPrompt(this.textContent)">What skills should I learn next?</div>
+              <div class="chat-prompt-chip" onclick="sendPrompt(this.textContent)">Help me prepare for interviews</div>
+              <div class="chat-prompt-chip" onclick="sendPrompt(this.textContent)">How do I negotiate salary?</div>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div class="chat-messages" id="chat-messages" style="display:none"></div>
+
+          <!-- Input -->
+          <div class="chat-input-area">
+            <div class="chat-input-wrap">
+              <textarea id="chat-input" placeholder="Ask about careers, skills, interviews..." rows="1"></textarea>
+              <button class="btn btn-primary btn-icon" id="chat-send-btn" onclick="sendChatMessage()">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── JOBS PAGE ─────────────────────────────────────────────────────── -->
+    <div class="page" id="page-jobs">
+      <div class="page-header">
+        <div class="page-title">Job Matches</div>
+        <div class="page-subtitle">Jobs matched to your skills and experience</div>
+      </div>
+      <div class="jobs-layout">
+        <div class="jobs-filters" style="flex-wrap:wrap;gap:10px">
+          <div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0">
+            <div class="search-wrap" style="flex:1">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" id="job-search" placeholder="Search any job — nurse, teacher, engineer, chef..." onkeydown="if(event.key==='Enter') searchJobs()" />
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="searchJobs()" style="white-space:nowrap;flex-shrink:0">Search</button>
+          </div>
+          <select class="filter-select" id="job-level-filter" onchange="filterJobs()">
+            <option value="">All levels</option>
+            <option value="entry">Entry</option>
+            <option value="mid">Mid</option>
+            <option value="senior">Senior</option>
+            <option value="lead">Lead</option>
+          </select>
+          <select class="filter-select" id="job-type-filter" onchange="filterJobs()">
+            <option value="">All types</option>
+            <option value="full_time">Full time</option>
+            <option value="part_time">Part time</option>
+            <option value="contract">Contract</option>
+            <option value="remote">Remote</option>
+          </select>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select class="filter-select" id="location-dropdown" onchange="handleLocationDropdown(this)">
+              <option value="global">🌍 Global</option>
+              <option value="local">📍 My Location</option>
+              <option value="custom">✏️ Custom...</option>
+            </select>
+            <div id="location-autocomplete-wrap" style="display:none;position:relative;width:200px">
+              <input type="text" class="search-input" id="custom-location-input" placeholder="Type a city..." autocomplete="off" oninput="locationAutocomplete(this.value)" style="width:100%" />
+              <div id="location-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:999;max-height:200px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px #00000060"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="jobs-reset-btn" onclick="resetJobSearch()" title="Reset search">↺ Reset</button>
+          </div>
+        </div>
+        <div class="jobs-tabs">
+          <button class="jobs-tab active" onclick="switchJobTab('all', this)">All Jobs</button>
+          <button class="jobs-tab" onclick="switchJobTab('saved', this)">🔖 Saved</button>
+        </div>
+        <div class="jobs-content">
+          <div class="jobs-grid" id="jobs-grid">
+            <div class="loading-state"><div class="spinner"></div><span>Finding your matches...</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SKILLS / GAP ANALYSIS PAGE ───────────────────────────────────── -->
+    <div class="page" id="page-skills">
+      <div class="page-header">
+        <div class="page-title">Skill Gap Analysis</div>
+        <div class="page-subtitle">Enter a job profile, pick your skills and level, then get your AI analysis</div>
+      </div>
+      <div class="skills-layout">
+
+        <!-- STEP 1: Job Profile -->
+        <div class="card">
+          <div class="card-title">① Enter Job Profile</div>
+          <p class="text-sm text-muted" style="margin-bottom:14px">Type the role you are targeting. We will load the relevant skills for it.</p>
+          <div style="display:flex;gap:10px">
+            <input type="text" class="form-input" id="job-profile-input" placeholder="e.g. Data Scientist, UX Designer, Nurse, Accountant..." style="flex:1" />
+            <button class="btn btn-primary" id="load-skills-btn">Load Skills</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Pick Your Skills -->
+        <div class="card" id="step2-card" style="display:none">
+          <div class="card-title">② Select Your Skills &amp; Level</div>
+          <p class="text-sm text-muted" style="margin-bottom:16px">Tick the skills you already have and set your proficiency level for each.</p>
+
+          <div id="job-skills-container">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+            <button class="btn btn-primary" id="analyze-btn" >🔍 Analyze My Skill Gap</button>
+          </div>
+        </div>
+
+        <!-- Past analyses -->
+        <div id="past-analyses"></div>
+
+        <!-- Analysis Result -->
+        <div id="analysis-result"></div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE PAGE ───────────────────────────────────────────────────── -->
+    <!-- ── MENTOR PAGE ── -->
+    <div class="page" id="page-mentor">
+      <div class="page-header">
+        <div class="page-title">1-on-1 Mentorship</div>
+        <div class="page-subtitle">Get personalized career guidance from an expert mentor</div>
+      </div>
+      <div class="skills-layout">
+
+      <!-- Already booked state -->
+      <div id="mentor-booked" style="display:none">
+        <div class="card" style="max-width:600px;margin:0 auto;text-align:center;padding:40px">
+          <div style="font-size:56px;margin-bottom:16px">🎉</div>
+          <h2 style="font-family:var(--font-display);font-size:22px;margin-bottom:8px">Session Booked!</h2>
+          <p class="text-sm text-muted" style="margin-bottom:24px;line-height:1.7">Your mentorship session has been confirmed. A mentor will reach out to you within 24 hours via email.</p>
+          <div class="card" style="background:var(--bg3);padding:16px;text-align:left;margin-bottom:20px">
+            <div id="mentor-session-details"></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px">
+            <button class="btn btn-primary" onclick="navigateTo('chat');setTimeout(()=>{createNewChat().then(()=>{document.getElementById('chat-input').value='I just booked a mentorship session. Can you help me prepare? What should I focus on before the call?';sendChatMessage();})},100)">
+              🧭 Prepare with AI
+            </button>
+            <button class="btn btn-ghost" onclick="navigateTo('profile')">
+              ✏️ Update Profile
+            </button>
+            <button class="btn btn-ghost" onclick="window.open('mailto:?subject=Mentorship Session Booked&body=I booked a 1-on-1 mentorship session on SkillForge AI. Looking forward to it!')">
+              📧 Email Reminder
+            </button>
+          </div>
+          <button class="btn btn-ghost" style="color:var(--text3);font-size:12px" onclick="showMentorBookingForm()">
+            ← Book another session
+          </button>
+        </div>
+      </div>
+
+      <!-- Booking state -->
+      <div id="mentor-booking">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px">
+
+          <!-- What you get -->
+          <div class="card">
+            <div class="card-title">✨ What's Included</div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px">
+              <div class="mentor-feature">
+                <span class="mentor-feature-icon">📞</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">60-min Video Call</div>
+                  <div class="text-sm text-muted">One-on-one session with a senior industry professional</div>
+                </div>
+              </div>
+              <div class="mentor-feature">
+                <span class="mentor-feature-icon">📄</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">Resume Review</div>
+                  <div class="text-sm text-muted">Detailed feedback on your resume and LinkedIn profile</div>
+                </div>
+              </div>
+              <div class="mentor-feature">
+                <span class="mentor-feature-icon">🗺️</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">Career Roadmap</div>
+                  <div class="text-sm text-muted">Personalized plan to reach your target role</div>
+                </div>
+              </div>
+              <div class="mentor-feature">
+                <span class="mentor-feature-icon">🎯</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">Interview Prep</div>
+                  <div class="text-sm text-muted">Mock interview + tips tailored to your target company</div>
+                </div>
+              </div>
+              <div class="mentor-feature">
+                <span class="mentor-feature-icon">💬</span>
+                <div>
+                  <div style="font-weight:600;font-size:14px">7-day Follow-up</div>
+                  <div class="text-sm text-muted">Chat support for a week after your session</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking form -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">📋 Tell Us Your Goals</div>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+                <div>
+                  <label class="form-label">What do you want to achieve?</label>
+                  <select class="form-input form-select" id="mentor-goal">
+                    <option value="">Select a goal...</option>
+                    <option value="career_switch">Switch careers / industries</option>
+                    <option value="promotion">Get promoted faster</option>
+                    <option value="job_search">Land a new job</option>
+                    <option value="salary">Negotiate a higher salary</option>
+                    <option value="skills">Build the right skills</option>
+                    <option value="startup">Start my own business</option>
+                    <option value="other">Something else</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Preferred session time</label>
+                  <select class="form-input form-select" id="mentor-time">
+                    <option value="morning">Morning (9am – 12pm)</option>
+                    <option value="afternoon">Afternoon (12pm – 5pm)</option>
+                    <option value="evening">Evening (5pm – 9pm)</option>
+                    <option value="weekend">Weekend</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Any specific questions or topics? (optional)</label>
+                  <textarea class="form-input" id="mentor-notes" rows="3" placeholder="e.g. I want to transition from marketing to product management..." style="resize:vertical"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price card -->
+            <div class="card mentor-price-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <div>
+                  <div style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Session Fee</div>
+                  <div style="font-size:32px;font-weight:800;font-family:var(--font-display);color:var(--accent)">₹500</div>
+                  <div style="font-size:12px;color:var(--text3)">~$10 USD · One time</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="mentor-badge">⭐ Top Rated</div>
+                  <div class="text-xs text-muted" style="margin-top:4px">4.9/5 from 200+ sessions</div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-full" id="mentor-pay-btn" onclick="startMentorPayment()">
+                💳 Book Session — ₹500
+              </button>
+              <div style="text-align:center;margin-top:10px">
+                <span class="text-xs text-muted">🔒 Secure payment via Razorpay · Instant confirmation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div><!-- end skills-layout -->
+    </div>
+
+    <div class="page" id="page-profile">
+      <div class="page-header">
+        <div class="page-title">My Profile</div>
+        <div class="page-subtitle">Keep your profile updated for better job matches</div>
+      </div>
+      <div class="profile-layout">
+        <div class="profile-grid">
+          <!-- Avatar card -->
+          <div>
+            <div class="profile-avatar-card">
+              <div class="profile-avatar-big" id="profile-avatar-big">?</div>
+              <div class="profile-name" id="profile-display-name">—</div>
+              <div class="profile-role" id="profile-display-role">—</div>
+            </div>
+          </div>
+
+          <!-- Edit form -->
+          <div class="card">
+            <div class="card-title">✏️ Edit Profile</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" id="p-name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-input" id="p-location" placeholder="City, Country" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Current Role</label>
+                <input type="text" class="form-input" id="p-current-role" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Target Role</label>
+                <input type="text" class="form-input" id="p-target-role" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Years of Experience</label>
+                <input type="number" class="form-input" id="p-experience" min="0" max="50" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Education Level</label>
+                <select class="form-input form-select" id="p-education">
+                  <option value="">Select...</option>
+                  <option value="high_school">High School</option>
+                  <option value="associate">Associate Degree</option>
+                  <option value="bachelor">Bachelor's Degree</option>
+                  <option value="master">Master's Degree</option>
+                  <option value="phd">PhD</option>
+                  <option value="bootcamp">Bootcamp</option>
+                  <option value="self_taught">Self-taught</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:4px">
+              <label class="form-label">Bio</label>
+              <textarea class="form-input" id="p-bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="form-group">
+                <label class="form-label">LinkedIn URL</label>
+                <input type="url" class="form-input" id="p-linkedin" placeholder="https://linkedin.com/in/..." />
+              </div>
+              <div class="form-group">
+                <label class="form-label">GitHub URL</label>
+                <input type="url" class="form-input" id="p-github" placeholder="https://github.com/..." />
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-primary" id="save-profile-btn" onclick="saveProfile()">Save Profile</button>
+              <button class="btn btn-ghost" onclick="confirmSignOut()" style="color:var(--red, #ef4444);border-color:var(--red, #ef4444)">🚪 Sign Out</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mentorship & Transactions -->
+        <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px">
+
+          <!-- Active Session -->
+          <div class="card" id="profile-mentor-session" style="display:none">
+            <div class="card-title">🎓 Active Mentorship Session</div>
+            <div id="profile-mentor-details"></div>
+            <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="navigateTo('mentor')">Go to Mentorship →</button>
+          </div>
+
+          <!-- Transaction History -->
+          <div class="card">
+            <div class="card-title">💳 Transaction History</div>
+            <div id="profile-transactions">
+              <div class="text-sm text-muted">Loading...</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ─── SIGN OUT CONFIRM MODAL ─────────────────────────────────────────────── -->
+<div id="signout-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5)">
+    <div style="font-size:44px;margin-bottom:12px">👋</div>
+    <h3 style="font-family:var(--font-display);font-size:18px;margin-bottom:8px">Sign out of SkillForge AI?</h3>
+    <p class="text-sm text-muted" style="margin-bottom:24px;line-height:1.6">You'll need to sign back in to access your dashboard, saved jobs, and analyses.</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-ghost" onclick="closeSignOutModal()" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" onclick="signOut()" style="flex:1;background:#ef4444;box-shadow:none">Yes, Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('chat-sidebar-toggle-btn');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      var sidebar = document.querySelector('.chat-sidebar');
+      if (!sidebar) return;
+      sidebar.classList.toggle('collapsed');
+    });
+  }
+});
+
+/* Footer modal logic */
+function showFooterModal(type) {
+  var modal = document.getElementById("footer-modal");
+  var title = document.getElementById("footer-modal-title");
+  var body = document.getElementById("footer-modal-body");
+
+  if (type === "privacy") {
+    title.innerText = "Privacy Policy";
+    body.innerHTML = `
+      <p>We collect your email and profile information to provide career recommendations.</p>
+      <p>We do not sell your personal data.</p>
+      <p>We use Supabase for authentication and database services.</p>
+      <p>Third-party APIs are used to fetch job listings.</p>
+      <p>You may contact us anytime regarding privacy concerns.</p>
+    `;
+  }
+
+  if (type === "terms") {
+    title.innerText = "Terms & Conditions";
+    body.innerHTML = `
+      <p>This platform provides career guidance and job listings.</p>
+      <p>We do not guarantee job accuracy.</p>
+      <p>Users must not misuse the platform.</p>
+      <p>We are not responsible for third-party services.</p>
+      <p>Terms may change without notice.</p>
+    `;
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeFooterModal() {
+  document.getElementById("footer-modal").style.display = "none";
+}
+</script>
+
+</body>
+</html>
