@@ -200,4 +200,4 @@ Jobs are fetched from **JSearch** (aggregates LinkedIn, Indeed, Glassdoor).
 
 ## License
 
-© 2026 SkillForge AI
+MIT © 2026 SkillForge AI
