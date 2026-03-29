@@ -1,4 +1,4 @@
-require('dotenv').config();
+FRONTrequire('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -21,12 +21,14 @@ app.use(cors({
       'http://127.0.0.1:5500',
       'http://localhost:3000',
       'http://127.0.0.1:3000',
+      'https://skillforge-ai-three.vercel.app',
       process.env.FRONTEND_URL,
     ].filter(Boolean);
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin || allowed.some(a => origin.startsWith(a))) {
       callback(null, true);
     } else {
+      console.log('[CORS] Blocked origin:', origin);
       callback(new Error('Not allowed by CORS: ' + origin));
     }
   },
