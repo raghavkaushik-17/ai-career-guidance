@@ -177,7 +177,6 @@ router.delete('/gap-analyses/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-module.exports = router;
 
 // GET /api/skills/for-job?job=Software Engineer
 // Returns skills relevant to a job profile using AI
@@ -210,3 +209,5 @@ Include 6-10 technical skills, 3-5 soft skills, 3-6 tools/platforms specific to 
     res.status(500).json({ error: 'Could not fetch skills for this job' });
   }
 });
+
+module.exports = router;
