@@ -2,8 +2,7 @@
 // Config — replace with your Supabase project values
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
-// ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
-// ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
+// ─── SkillForge AI Frontend App ─────────────────────────────────────
 // ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
 
 const { createClient } = supabase;
@@ -1305,6 +1304,59 @@ function goToLanding() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.goToLanding = goToLanding;
+
+// ─── PROFILE LOCATION AUTOCOMPLETE ──────────────────────────────────────────────
+let _profileLocDebounce = null;
+
+function profileLocationAutocomplete(query) {
+  const suggestions = document.getElementById('p-location-suggestions');
+  if (!query || query.length < 2) { suggestions.style.display = 'none'; return; }
+  clearTimeout(_profileLocDebounce);
+  _profileLocDebounce = setTimeout(async () => {
+    try {
+      const res = await fetch(
+        'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q=' + encodeURIComponent(query),
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      const data = await res.json();
+      suggestions.innerHTML = '';
+      if (!data.length) {
+        suggestions.innerHTML = '<div style="padding:10px 14px;font-size:13px;color:var(--text3)">No location found</div>';
+        suggestions.style.display = '';
+        return;
+      }
+      data.slice(0, 6).forEach(p => {
+        const city = p.address?.city || p.address?.town || p.address?.village || p.address?.county || p.name;
+        const country = p.address?.country || '';
+        const label = [city, country].filter(Boolean).join(', ');
+        const full = p.display_name.split(',').slice(0, 3).join(', ');
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:9px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);color:var(--text);transition:background 0.15s';
+        div.innerHTML = '<div style="font-weight:500">' + label + '</div><div style="font-size:11px;color:var(--text3);margin-top:1px">' + full + '</div>';
+        div.onmouseenter = () => div.style.background = 'var(--bg3)';
+        div.onmouseleave = () => div.style.background = '';
+        div.onclick = () => {
+          document.getElementById('p-location').value = label;
+          suggestions.style.display = 'none';
+        };
+        suggestions.appendChild(div);
+      });
+      suggestions.style.display = '';
+    } catch {
+      suggestions.style.display = 'none';
+    }
+  }, 350);
+}
+
+// Close profile location suggestions on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#p-location')?.parentElement && !e.target.closest('#p-location-suggestions')) {
+    const s = document.getElementById('p-location-suggestions');
+    if (s) s.style.display = 'none';
+  }
+});
+
+window.profileLocationAutocomplete = profileLocationAutocomplete;
 
 // ─── LANDING FEATURE CLICK ────────────────────────────────────────────────────
 function openFeature(page) {
