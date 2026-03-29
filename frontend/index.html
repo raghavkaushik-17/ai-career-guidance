@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <title>SkillForge AI — Your AI Career Companion</title>
   <link rel="stylesheet" href="css/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -204,7 +204,7 @@
       <p class="land-footer-equal">SkillForge AI is an Equal Opportunity Platform: Minority / Women / Disability / Veteran / Gender Identity / Sexual Orientation / Age.</p>
       <div class="land-footer-links-row">
         <a class="land-footer-link" href="#" onclick="showFooterModal('privacy')">Privacy</a>
-        <a class="land-footer-link" href="mailto:support@skillforgeai.com">Contact</a>
+        <a class="land-footer-link" href="/cdn-cgi/l/email-protection#671412171708151327140c0e0b0b0108150002060e4904080a">Contact</a>
         <a class="land-footer-link" href="#" onclick="showFooterModal('terms')">Terms</a>
       </div>
       <div class="land-footer-text">© 2026 SkillForge AI, Inc. or its affiliates. All rights reserved.</div>
@@ -747,59 +747,63 @@
   </div>
 </div>
 
+<!-- ─── MOBILE BOTTOM NAV ──────────────────────────────────────────────────── -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-btn active" data-page="chat" onclick="mobileNav('chat',this)">
+    <span class="mn-icon">💬</span>
+    <span>Advisor</span>
+  </button>
+  <button class="mobile-nav-btn" data-page="jobs" onclick="mobileNav('jobs',this)">
+    <span class="mn-icon">💼</span>
+    <span>Jobs</span>
+  </button>
+  <button class="mobile-nav-btn" data-page="skills" onclick="mobileNav('skills',this)">
+    <span class="mn-icon">📊</span>
+    <span>Skills</span>
+  </button>
+  <button class="mobile-nav-btn" data-page="mentor" onclick="mobileNav('mentor',this)">
+    <span class="mn-icon">🎓</span>
+    <span>Mentor</span>
+  </button>
+  <button class="mobile-nav-btn" data-page="profile" onclick="mobileNav('profile',this)">
+    <span class="mn-icon">👤</span>
+    <span>Profile</span>
+  </button>
+</nav>
+
 <!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
-
 <!-- Scripts -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/api.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="js/api.js"></script>
 <script src="js/app.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Chat sidebar toggle
   var btn = document.getElementById('chat-sidebar-toggle-btn');
-  if (btn) {
+  var chatSidebar = document.querySelector('.chat-sidebar');
+  if (btn && chatSidebar) {
     btn.addEventListener('click', function() {
-      var sidebar = document.querySelector('.chat-sidebar');
-      if (!sidebar) return;
-      sidebar.classList.toggle('collapsed');
+      chatSidebar.classList.toggle('collapsed');
     });
   }
+
+  // Landing mobile menu toggle
+  var mobileMenuBtn = document.getElementById('land-hamburger');
+  var mobileMenu = document.getElementById('land-mobile-menu');
+  if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', function() {
+      mobileMenu.classList.toggle('open');
+    });
+  }
+
+  // Initialize default page
+  if (document.getElementById('page-chat')) {
+    navigateTo('chat');
+  }
+
+  // Optional: Autofocus chat input on page load
+  var chatInput = document.getElementById('chat-input');
+  if (chatInput) chatInput.focus();
 });
-
-/* Footer modal logic */
-function showFooterModal(type) {
-  var modal = document.getElementById("footer-modal");
-  var title = document.getElementById("footer-modal-title");
-  var body = document.getElementById("footer-modal-body");
-
-  if (type === "privacy") {
-    title.innerText = "Privacy Policy";
-    body.innerHTML = `
-      <p>We collect your email and profile information to provide career recommendations.</p>
-      <p>We do not sell your personal data.</p>
-      <p>We use Supabase for authentication and database services.</p>
-      <p>Third-party APIs are used to fetch job listings.</p>
-      <p>You may contact us anytime regarding privacy concerns.</p>
-    `;
-  }
-
-  if (type === "terms") {
-    title.innerText = "Terms & Conditions";
-    body.innerHTML = `
-      <p>This platform provides career guidance and job listings.</p>
-      <p>We do not guarantee job accuracy.</p>
-      <p>Users must not misuse the platform.</p>
-      <p>We are not responsible for third-party services.</p>
-      <p>Terms may change without notice.</p>
-    `;
-  }
-
-  modal.style.display = "flex";
-}
-
-function closeFooterModal() {
-  document.getElementById("footer-modal").style.display = "none";
-}
 </script>
-
-</body>
-</html>

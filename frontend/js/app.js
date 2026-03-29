@@ -3,6 +3,7 @@
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
+// ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -243,6 +244,9 @@ function navigateTo(page) {
   document.querySelector('.nav-item[data-page="' + page + '"]')?.classList.add('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page)?.classList.add('active');
+  // Sync mobile nav
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.mobile-nav-btn[data-page="' + page + '"]')?.classList.add('active');
   if (page === 'jobs') restoreJobsState();
   if (page === 'skills') loadSkillsPage();
   if (page === 'profile') loadProfile();
@@ -1340,3 +1344,54 @@ function toggleChatSidebar() {
   if (btn) btn.textContent = isOpen ? '✕' : '☰';
 }
 window.toggleChatSidebar = toggleChatSidebar;
+
+// ─── FOOTER MODALS ────────────────────────────────────────────────────────────
+const footerContent = {
+  privacy: {
+    title: 'Privacy Policy',
+    body: `<h4 style="color:#f0f0f8;margin-bottom:8px">What we collect</h4>
+<p>We collect your email, profile information (name, role, skills, experience), and chat history to power your personalised career experience. We do not sell your data to third parties.</p>
+<h4 style="color:#f0f0f8;margin:16px 0 8px">How we use it</h4>
+<p>Your data is used solely to provide AI career guidance, job matching, and skill gap analysis. AI conversations are processed via Groq and are not stored beyond your session unless you explicitly save them.</p>
+<h4 style="color:#f0f0f8;margin:16px 0 8px">Data storage</h4>
+<p>Data is stored securely in Supabase with row-level security. Only you can access your own data. Payments are handled by Razorpay and we do not store card details.</p>
+<h4 style="color:#f0f0f8;margin:16px 0 8px">Your rights</h4>
+<p>You can delete your account and all associated data at any time by contacting us at support@skillforgeai.com.</p>
+<p style="margin-top:16px;font-size:12px">Last updated: March 2026</p>`
+  },
+  terms: {
+    title: 'Terms of Service',
+    body: `<h4 style="color:#f0f0f8;margin-bottom:8px">Use of service</h4>
+<p>SkillForge AI is provided for personal career development use. You agree not to misuse the platform, attempt to reverse-engineer it, or use it for any unlawful purpose.</p>
+<h4 style="color:#f0f0f8;margin:16px 0 8px">AI-generated content</h4>
+<p>Career advice, job matches, and skill analyses are AI-generated and should be used as guidance only. We do not guarantee employment outcomes or the accuracy of job listings.</p>
+<h4 style="color:#f0f0f8;margin:16px 0 8px">Payments</h4>
+<p>Mentorship session payments of ₹500 are processed via Razorpay. Payments are non-refundable once a session is booked. Contact us within 24 hours if you experience any payment issues.</p>
+<h4 style="color:#f0f0f8;margin:16px 0 8px">Limitation of liability</h4>
+<p>SkillForge AI is not liable for any career decisions made based on AI-generated advice. Use the platform as one of many tools in your career journey.</p>
+<p style="margin-top:16px;font-size:12px">Last updated: March 2026</p>`
+  }
+};
+
+function showFooterModal(type) {
+  const modal = document.getElementById('footer-modal');
+  const title = document.getElementById('footer-modal-title');
+  const body = document.getElementById('footer-modal-body');
+  if (!modal || !footerContent[type]) return;
+  title.textContent = footerContent[type].title;
+  body.innerHTML = footerContent[type].body;
+  modal.style.display = 'flex';
+}
+
+function closeFooterModal() {
+  document.getElementById('footer-modal').style.display = 'none';
+}
+
+window.showFooterModal = showFooterModal;
+window.closeFooterModal = closeFooterModal;
+
+// ─── MOBILE NAV ───────────────────────────────────────────────────────────────
+function mobileNav(page, btn) {
+  navigateTo(page);
+}
+window.mobileNav = mobileNav;
