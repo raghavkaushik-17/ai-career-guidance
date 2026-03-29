@@ -4,6 +4,7 @@ const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
 // ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
+// ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1199,6 +1200,16 @@ async function loadProfileTransactions() {
 function showMentorBookingForm() {
   document.getElementById('mentor-booked').style.display = 'none';
   document.getElementById('mentor-booking').style.display = '';
+  // Reset button state so it can be clicked again
+  const btn = document.getElementById('mentor-pay-btn');
+  if (btn) { btn.disabled = false; btn.textContent = '💳 Book Session — ₹500'; }
+  // Clear form fields
+  const goal = document.getElementById('mentor-goal');
+  const time = document.getElementById('mentor-time');
+  const notes = document.getElementById('mentor-notes');
+  if (goal) goal.value = '';
+  if (time) time.value = '';
+  if (notes) notes.value = '';
 }
 
 window.loadProfileTransactions = loadProfileTransactions;
