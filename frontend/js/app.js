@@ -2,8 +2,7 @@
 // Config — replace with your Supabase project values
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
-// ─── SkillForge AI Frontend App ─────────────────────────────────────
-// ─── SkillForge AI Frontend App ────────────────────────────────────────────────────
+// ─── SkillForge AI Frontend App // ─── SkillFor
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -728,16 +727,13 @@ function askAboutJob(title, company) {
 
 // ─── Skills ───────────────────────────────────────────────────────────────────
 async function loadSkillsPage() {
-  loadPastAnalyses();
-  // Only reset if there's no active analysis showing — preserve state on return
-  const ar = document.getElementById('analysis-result');
-  const hasResult = ar && ar.innerHTML.trim().length > 0;
-  if (!hasResult) {
-    const s2 = document.getElementById('step2-card');
-    if (s2) s2.style.display = 'none';
-    const jp = document.getElementById('job-profile-input');
-    if (jp) jp.value = '';
+  // Restore cached analyses without hitting API again if we have them
+  if (appState.pastAnalyses && appState.pastAnalyses.length) {
+    renderPastAnalysesList();
+  } else {
+    await loadPastAnalyses();
   }
+  // Don't reset the form or result — preserve state when navigating back
 }
 
 async function loadSkillsForJob() {
@@ -841,21 +837,71 @@ async function runGapAnalysis() {
 async function loadPastAnalyses() {
   try {
     const analyses = await api.getPastAnalyses();
-    const el = document.getElementById('past-analyses');
-    if (!el) return;
-    if (!analyses || !analyses.length) { el.innerHTML = ''; return; }
-    let html = '<div class="text-xs text-muted" style="margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Past Analyses</div>';
-    analyses.slice(0, 3).forEach(a => {
-      const color = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
-      const safeRole = escHtml(a.target_position).replace(/'/g, '&#39;');
-      html += '<div style="padding:8px 12px;background:var(--bg3);border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px">';
-      html += '<span class="text-sm" style="cursor:pointer;flex:1" onclick="rerunAnalysis(\'' + safeRole + '\')">' + escHtml(a.target_position) + '</span>';
-      html += '<span class="text-xs" style="color:' + color + ';flex-shrink:0">' + a.match_score + '%</span>';
-      html += '<button onclick="deleteAnalysis(\'' + a.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 4px;flex-shrink:0" title="Delete">🗑</button>';
-      html += '</div>';
-    });
-    el.innerHTML = html;
+    appState.pastAnalyses = analyses || [];
+    renderPastAnalysesList();
   } catch(e) { console.warn('Could not load past analyses', e); }
+}
+
+function renderPastAnalysesList() {
+  const el = document.getElementById('past-analyses');
+  if (!el) return;
+  const analyses = appState.pastAnalyses || [];
+  if (!analyses.length) { el.innerHTML = ''; return; }
+
+  let html = '<div class="card" style="margin-bottom:0">';
+  html += '<div class="card-title" style="margin-bottom:12px">📋 Past Analyses</div>';
+  analyses.forEach((a, i) => {
+    const color = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
+    const date = new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+   html += `
+<div id="past-item-${a.id}" 
+style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" 
+onclick="openPastAnalysis('${a.id}')" 
+onmouseenter="this.style.borderColor='var(--border2)'" 
+onmouseleave="this.style.borderColor='transparent'">
+`;
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+    html += '<div style="flex:1;min-width:0">';
+    html += '<div style="font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(a.target_position) + '</div>';
+    html += '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + date + '</div>';
+    html += '</div>';
+    html += '<span style="font-weight:700;font-size:14px;color:' + color + ';flex-shrink:0">' + a.match_score + '%</span>';
+    html += `
+<button 
+onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')" 
+style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s" 
+onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'" 
+onmouseleave="this.style.background='none';this.style.color='var(--text3)'" 
+title="Delete">🗑</button>
+`;
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function openPastAnalysis(id) {
+  const a = (appState.pastAnalyses || []).find(x => x.id === id);
+  if (!a) return;
+  // Highlight selected
+  document.querySelectorAll('[id^="past-item-"]').forEach(el => el.style.borderColor = 'transparent');
+  const item = document.getElementById('past-item-' + id);
+  if (item) item.style.borderColor = 'var(--accent)';
+  // Show result
+  renderAnalysis(a, a.target_position);
+  // Scroll to result
+  setTimeout(() => {
+    document.getElementById('analysis-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function confirmDeleteAnalysis(id) {
+  const a = (appState.pastAnalyses || []).find(x => x.id === id);
+  if (!a) return;
+  if (confirm('Delete analysis for "' + a.target_position + '"?')) {
+    deleteAnalysis(id);
+  }
 }
 
 function rerunAnalysis(role) {
@@ -894,7 +940,9 @@ function renderAnalysis(a, role) {
     '<span class="strength-item">✓ ' + escHtml(s) + '</span>'
   ).join('');
 
-  document.getElementById('analysis-result').innerHTML =
+  const _arEl = document.getElementById('analysis-result');
+  if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
+  _arEl.innerHTML =
     '<div class="analysis-result">' +
       '<div class="analysis-header">' +
         '<div class="score-ring-wrap">' +
@@ -1264,8 +1312,15 @@ function resourceToUrl(resource) {
 async function deleteAnalysis(id) {
   try {
     await api.deleteAnalysis(id);
+    appState.pastAnalyses = (appState.pastAnalyses || []).filter(a => a.id !== id);
+    renderPastAnalysesList();
+    // Clear result if the deleted one was being shown
+    const resultEl = document.getElementById('analysis-result');
+    if (resultEl && resultEl.dataset.analysisId === id) {
+      resultEl.innerHTML = '';
+      resultEl.removeAttribute('data-analysis-id');
+    }
     toast('Analysis deleted', 'success');
-    loadPastAnalyses();
   } catch(e) {
     toast('Could not delete analysis', 'error');
   }
@@ -1273,6 +1328,9 @@ async function deleteAnalysis(id) {
 
 window.resourceToUrl = resourceToUrl;
 window.deleteAnalysis = deleteAnalysis;
+window.openPastAnalysis = openPastAnalysis;
+window.confirmDeleteAnalysis = confirmDeleteAnalysis;
+window.renderPastAnalysesList = renderPastAnalysesList;
 
 // ─── LANDING PAGE ─────────────────────────────────────────────────────────────
 function showLandingAuth(mode) {
