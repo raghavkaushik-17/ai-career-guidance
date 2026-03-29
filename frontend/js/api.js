@@ -1,5 +1,7 @@
 // ─── SkillForge AI Frontend API Client ────────────────────────────────────────────
-const API_BASE = 'https://skillforge-ai-three.vercel.app/';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3001/api'
+  : https://skillforge-ai-3v5l.onrender.comm;
 
 function getToken() {
   try {
