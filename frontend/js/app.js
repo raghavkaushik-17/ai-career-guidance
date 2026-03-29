@@ -454,8 +454,9 @@ function switchJobTab(tab, el) {
   appState.currentJobTab = tab;
   document.querySelectorAll('.jobs-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('job-search').value = '';
+  // Don't clear search — preserve what user typed
   renderJobs();
+  saveJobsState();
 }
 
 function renderJobsData(jobs) {
@@ -728,12 +729,15 @@ function askAboutJob(title, company) {
 // ─── Skills ───────────────────────────────────────────────────────────────────
 async function loadSkillsPage() {
   loadPastAnalyses();
-  const s2 = document.getElementById('step2-card');
-  if (s2) s2.style.display = 'none';
-  const jp = document.getElementById('job-profile-input');
-  if (jp) jp.value = '';
+  // Only reset if there's no active analysis showing — preserve state on return
   const ar = document.getElementById('analysis-result');
-  if (ar) ar.innerHTML = '';
+  const hasResult = ar && ar.innerHTML.trim().length > 0;
+  if (!hasResult) {
+    const s2 = document.getElementById('step2-card');
+    if (s2) s2.style.display = 'none';
+    const jp = document.getElementById('job-profile-input');
+    if (jp) jp.value = '';
+  }
 }
 
 async function loadSkillsForJob() {
