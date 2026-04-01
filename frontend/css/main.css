@@ -234,10 +234,13 @@ html, body {
 .sidebar.collapsed .sidebar-section-title,
 .sidebar.collapsed .nav-item span:not(.icon),
 .sidebar.collapsed .user-info,
-.sidebar.collapsed .sidebar-footer > button { display: none; }
-.sidebar.collapsed .nav-item { justify-content: center; padding: 10px 0; }
-.sidebar.collapsed .user-card { justify-content: center; padding: 10px 0; }
+.sidebar.collapsed .sidebar-footer > button { display: none !important; }
+.sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; gap: 0; }
+.sidebar.collapsed .user-card { justify-content: center; padding: 10px 0; gap: 0; }
 .sidebar.collapsed .sidebar-header { justify-content: center; padding: 14px 0; gap: 0; }
+.sidebar.collapsed .sidebar-header > div { display: none !important; }
+.sidebar.collapsed #sidebar-toggle-btn { display: flex !important; align-items: center; justify-content: center; width: 100%; }
+.sidebar.collapsed { overflow: hidden; }
 
 .sidebar-header {
   padding: 16px 20px;
