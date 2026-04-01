@@ -236,13 +236,44 @@ function showAuthScreen() {
   if (landing) landing.style.display = 'none';
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
+  // Clear any leftover errors
+  ['login-error','signup-error'].forEach(id => { const el = document.getElementById(id); if (el) { el.textContent=''; el.style.display='none'; } });
 }
 function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+window.togglePassword = togglePassword;
+
 async function signOut() {
+  closeSignOutModal();
   await sb.auth.signOut();
   sessionStorage.removeItem('sf_jobs_state');
   appState = { user:null, profile:null, currentSession:null, sessions:[], allJobs:[], matchedJobs:[], mySkills:[], allSkills:[], currentJobTab:'all', locationFilter:'global', jobsMap:{}, isTyping:false };
+  // Clear all form errors and inputs
+  ['login-error','signup-error'].forEach(id => { const el = document.getElementById(id); if (el) { el.textContent=''; el.style.display='none'; } });
+  ['login-email','login-password','signup-name','signup-email','signup-password'].forEach(id => { const el = document.getElementById(id); if (el) el.value=''; });
+  // Reset to login form
+  const lf = document.getElementById('login-form');
+  const sf = document.getElementById('signup-form');
+  if (lf) lf.style.display = 'flex';
+  if (sf) sf.style.display = 'none';
+  // Reset login button
+  const btn = document.getElementById('login-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+  // Show landing instead of auth
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('landing-screen').style.display = '';
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
@@ -270,7 +301,15 @@ function updateSidebar() {
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 async function loadChatSessions() {
-  try { appState.sessions = await api.getSessions(); renderSessionsList(); }
+  try {
+    appState.sessions = await api.getSessions();
+    renderSessionsList();
+    // Show welcome if no active session
+    if (!appState.currentSession) {
+      document.getElementById('chat-welcome').style.display = 'flex';
+      document.getElementById('chat-messages').style.display = 'none';
+    }
+  }
   catch { toast('Could not load conversations', 'error'); }
 }
 
@@ -329,7 +368,12 @@ async function createNewChat() {
     document.getElementById('chat-messages').style.display = 'flex';
     document.getElementById('chat-messages').innerHTML = '';
     document.getElementById('chat-input').focus();
-  } catch { toast('Could not create conversation', 'error'); }
+  } catch(err) {
+    toast('Could not create conversation', 'error');
+    // Show welcome so user isn't stuck
+    document.getElementById('chat-welcome').style.display = 'flex';
+    document.getElementById('chat-messages').style.display = 'none';
+  }
 }
 
 async function sendChatMessage() {
@@ -861,8 +905,8 @@ function renderPastAnalysesList() {
   analyses.forEach((a, i) => {
     const color = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
     const date = new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-   html += `
-<div id="past-item-${a.id}" 
+    html += `
+<div id="past-item-${a.id}"
      style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s"
      onclick="openPastAnalysis('${a.id}')"
      onmouseenter="this.style.borderColor='var(--border2)'"
