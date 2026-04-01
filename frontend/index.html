@@ -330,12 +330,12 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-header" style="gap:8px">
-      <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle navigation" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;padding:2px 4px;flex-shrink:0;line-height:1;border-radius:6px;transition:background 0.15s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background='none'">☰</button>
-      <div onclick="goToLanding()" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:10px;flex:1;transition:opacity 0.2s" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'" title="Back to home">
+    <div class="sidebar-logo-bar">
+      <div class="sidebar-logo-wrap" onclick="goToLanding()" title="Back to home">
         <img src="skillforge-icon.svg" style="width:40px;height:32px;flex-shrink:0"/>
         <span class="logo-text">SkillForge AI</span>
       </div>
+      <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle navigation" class="sidebar-toggle-btn">☰</button>
     </div>
 
     <nav class="sidebar-nav">

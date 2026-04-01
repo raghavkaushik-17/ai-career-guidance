@@ -242,18 +242,39 @@ html, body {
 .sidebar.collapsed #sidebar-toggle-btn { display: flex !important; align-items: center; justify-content: center; width: 100%; }
 .sidebar.collapsed { overflow: hidden; }
 
-.sidebar-header {
-  padding: 16px 20px;
+.sidebar-logo-bar {
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-  transition: opacity 0.2s;
-  overflow-x: auto;
-  overflow-y: visible;
-  white-space: nowrap;
-  scrollbar-width: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
 }
-.sidebar-header::-webkit-scrollbar { display: none; }
-.sidebar-header:hover { opacity: 0.75; }
+.sidebar-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+  min-width: 0;
+  transition: opacity 0.2s;
+}
+.sidebar-logo-wrap:hover { opacity: 0.75; }
+.sidebar-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 18px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.sidebar-toggle-btn:hover { background: var(--bg3); color: var(--text); }
 
 .logo-icon {
   width: 36px; height: 36px;
