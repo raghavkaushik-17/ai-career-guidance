@@ -230,18 +230,21 @@ html, body {
 }
 .sidebar.collapsed {
   width: 56px;
+  overflow: hidden;
 }
+/* Hide text elements when collapsed */
 .sidebar.collapsed .logo-text,
 .sidebar.collapsed .sidebar-section-title,
-.sidebar.collapsed .nav-item span:not(.icon),
 .sidebar.collapsed .user-info,
-.sidebar.collapsed .sidebar-footer > button { display: none !important; }
-.sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; gap: 0; }
+.sidebar.collapsed .sidebar-footer > button,
+.sidebar.collapsed .sidebar-logo-wrap { display: none !important; }
+/* Hide nav item text but keep icon */
+.sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; gap: 0; width: 56px; }
+.sidebar.collapsed .nav-item span:last-child { display: none !important; }
+/* Center user card icon */
 .sidebar.collapsed .user-card { justify-content: center; padding: 10px 0; gap: 0; }
-.sidebar.collapsed .sidebar-header { justify-content: center; padding: 14px 0; gap: 0; }
-.sidebar.collapsed .sidebar-header > div { display: none !important; }
-.sidebar.collapsed #sidebar-toggle-btn { display: flex !important; align-items: center; justify-content: center; width: 100%; }
-.sidebar.collapsed { overflow: hidden; }
+/* Center logo bar, show only toggle */
+.sidebar.collapsed .sidebar-logo-bar { justify-content: center; padding: 14px 0; }
 
 .sidebar-logo-bar {
   padding: 14px 16px;
