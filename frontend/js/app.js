@@ -3,7 +3,7 @@
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App // ─── SkillFor
-// ───
+
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -328,6 +328,7 @@ function renderSessionsList() {
 async function openSession(id) {
   appState.currentSession = appState.sessions.find(s => s.id === id);
   renderSessionsList();
+  closeChatSidebar();
   document.getElementById('chat-welcome').style.display = 'none';
   document.getElementById('chat-messages').style.display = 'flex';
   document.getElementById('chat-messages').innerHTML = '<div class="loading-state"><div class="spinner"></div><span>Loading...</span></div>';
@@ -917,7 +918,7 @@ function renderPastAnalysesList() {
   analyses.forEach((a, i) => {
     const color = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
     const date = new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    html += `
+   html += `
 <div id="past-item-${a.id}"
      style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s"
      onclick="openPastAnalysis('${a.id}')"
@@ -930,7 +931,7 @@ function renderPastAnalysesList() {
     html += '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + date + '</div>';
     html += '</div>';
     html += '<span style="font-weight:700;font-size:14px;color:' + color + ';flex-shrink:0">' + a.match_score + '%</span>';
-    html += `
+   html += `
 <button onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')"
         style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s"
         onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'"
@@ -1541,15 +1542,36 @@ window.goToLandingFromAuth = goToLandingFromAuth;
 window.confirmSignOut = confirmSignOut;
 window.closeSignOutModal = closeSignOutModal;
 
+// ─── MAIN SIDEBAR TOGGLE ─────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
+  sidebar.classList.toggle('collapsed');
+}
+window.toggleSidebar = toggleSidebar;
+
 // ─── CHAT SIDEBAR TOGGLE ─────────────────────────────────────────────────────
 function toggleChatSidebar() {
   const sidebar = document.querySelector('.chat-sidebar');
   const btn = document.getElementById('chat-sidebar-toggle-btn');
+  const backdrop = document.getElementById('chat-sidebar-backdrop');
   if (!sidebar) return;
   const isOpen = sidebar.classList.toggle('open');
+  if (backdrop) backdrop.classList.toggle('visible', isOpen);
   if (btn) btn.textContent = isOpen ? '✕' : '☰';
 }
+
+function closeChatSidebar() {
+  const sidebar = document.querySelector('.chat-sidebar');
+  const btn = document.getElementById('chat-sidebar-toggle-btn');
+  const backdrop = document.getElementById('chat-sidebar-backdrop');
+  if (sidebar) sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('visible');
+  if (btn) btn.textContent = '☰';
+}
+
 window.toggleChatSidebar = toggleChatSidebar;
+window.closeChatSidebar = closeChatSidebar;
 
 // ─── FOOTER MODALS ────────────────────────────────────────────────────────────
 const footerContent = {

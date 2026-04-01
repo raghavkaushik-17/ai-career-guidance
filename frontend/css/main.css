@@ -225,7 +225,19 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.25s ease;
 }
+.sidebar.collapsed {
+  width: 56px;
+}
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .sidebar-section-title,
+.sidebar.collapsed .nav-item span:not(.icon),
+.sidebar.collapsed .user-info,
+.sidebar.collapsed .sidebar-footer > button { display: none; }
+.sidebar.collapsed .nav-item { justify-content: center; padding: 10px 0; }
+.sidebar.collapsed .user-card { justify-content: center; padding: 10px 0; }
+.sidebar.collapsed .sidebar-header { justify-content: center; padding: 14px 0; gap: 0; }
 
 .sidebar-header {
   padding: 16px 20px;
@@ -369,24 +381,34 @@ html, body {
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
-
 .chat-sidebar {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
   width: 0;
   min-width: 0;
   background: var(--bg2);
   border-right: none;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
   overflow: hidden;
-  min-height: 0;
-  transition: width 0.2s ease;
+  z-index: 50;
+  transition: width 0.2s ease, box-shadow 0.2s ease;
 }
 .chat-sidebar.open {
-  width: 220px;
+  width: 240px;
   border-right: 1px solid var(--border);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.4);
 }
+.chat-sidebar-backdrop {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 49;
+  background: rgba(0,0,0,0.3);
+}
+.chat-sidebar-backdrop.visible { display: block; }
 
 .chat-sidebar-header {
   padding: 14px;
