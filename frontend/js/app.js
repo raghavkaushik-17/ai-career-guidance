@@ -3,7 +3,7 @@
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App // ─── SkillFor
-
+// ───
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -230,6 +230,7 @@ function showApp() {
   if (landing) landing.style.display = 'none';
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
+  document.body.classList.add('app-active');
 }
 function showAuthScreen() {
   const landing = document.getElementById('landing-screen');
@@ -274,6 +275,7 @@ async function signOut() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('landing-screen').style.display = '';
+  document.body.classList.remove('app-active');
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
@@ -359,6 +361,19 @@ function showTyping() {
 function hideTyping() { document.getElementById('typing-msg')?.remove(); }
 
 async function createNewChat() {
+  // Show welcome screen immediately — session created on first message
+  appState.currentSession = null;
+  document.getElementById('chat-welcome').style.display = 'flex';
+  document.getElementById('chat-messages').style.display = 'none';
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-input').value = '';
+  document.getElementById('chat-input').focus();
+  // Deselect any active session in sidebar
+  document.querySelectorAll('.chat-session-item').forEach(el => el.classList.remove('active'));
+}
+
+async function _createSessionIfNeeded() {
+  if (appState.currentSession) return true;
   try {
     const session = await api.createSession();
     appState.sessions.unshift(session);
@@ -366,13 +381,10 @@ async function createNewChat() {
     renderSessionsList();
     document.getElementById('chat-welcome').style.display = 'none';
     document.getElementById('chat-messages').style.display = 'flex';
-    document.getElementById('chat-messages').innerHTML = '';
-    document.getElementById('chat-input').focus();
+    return true;
   } catch(err) {
     toast('Could not create conversation', 'error');
-    // Show welcome so user isn't stuck
-    document.getElementById('chat-welcome').style.display = 'flex';
-    document.getElementById('chat-messages').style.display = 'none';
+    return false;
   }
 }
 
@@ -381,7 +393,7 @@ async function sendChatMessage() {
   const input = document.getElementById('chat-input');
   const content = input.value.trim();
   if (!content) return;
-  if (!appState.currentSession) { await createNewChat(); if (!appState.currentSession) return; }
+  if (!appState.currentSession) { const ok = await _createSessionIfNeeded(); if (!ok) return; }
   input.value = ''; input.style.height = 'auto';
   appendMessage('user', content);
   appState.isTyping = true;
@@ -918,7 +930,7 @@ function renderPastAnalysesList() {
     html += '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + date + '</div>';
     html += '</div>';
     html += '<span style="font-weight:700;font-size:14px;color:' + color + ';flex-shrink:0">' + a.match_score + '%</span>';
-   html += `
+    html += `
 <button onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')"
         style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s"
         onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'"
@@ -1431,6 +1443,7 @@ function goToLanding() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('landing-screen').style.display = '';
+  document.body.classList.remove('app-active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.goToLanding = goToLanding;

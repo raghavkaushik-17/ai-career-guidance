@@ -107,10 +107,10 @@ html, body {
   font-size: 22px;
   font-weight: 800;
   background: linear-gradient(135deg, #fff 40%, var(--accent2));
-  color: transparent;               /* fallback for non-WebKit browsers */
-  -webkit-background-clip: text;    /* Chrome, Safari */
-  -webkit-text-fill-color: transparent; /* Chrome, Safari */
-  background-clip: text;            /* Firefox support */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .auth-title {
@@ -253,10 +253,10 @@ html, body {
   font-size: 15px;
   font-weight: 800;
   background: linear-gradient(135deg, #fff 40%, var(--accent2));
-  color: transparent;               /* fallback for non-WebKit browsers */
-  -webkit-background-clip: text;    /* Chrome, Safari */
-  -webkit-text-fill-color: transparent; /* Chrome, Safari */
-  background-clip: text;            /* Firefox now supports this */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
   white-space: nowrap;
   overflow: visible;
   padding-bottom: 2px;
@@ -353,11 +353,11 @@ html, body {
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--text) 60%, var(--text2) 100%);
-  -webkit-background-clip: text; /* for Chrome, Safari */
-  -webkit-text-fill-color: transparent; /* for Chrome, Safari */
-  background-clip: text; /* standard property for Firefox */
-  color: transparent; /* fallback */
+  background: linear-gradient(135deg, var(--text) 60%, var(--text2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 4px;
 }
 
@@ -874,11 +874,9 @@ a.resource-link:hover { background: var(--accent); color: #fff; text-decoration:
   /* Hide desktop sidebar */
   .sidebar { display: none; }
 
-  /* Show bottom nav */
-  .mobile-nav { display: flex !important; }
 
   /* Add padding so content isn't behind bottom nav */
-  .main-content { padding-bottom: 64px; }
+  body.app-active .main-content { padding-bottom: 64px; }
 
   .auth-card { padding: 28px 20px; }
   .jobs-filters { gap: 6px; flex-direction: column; }
@@ -1444,6 +1442,9 @@ a.resource-link:hover { background: var(--accent); color: #fff; text-decoration:
   justify-content: space-around;
   padding: 0 4px;
   padding-bottom: env(safe-area-inset-bottom);
+}
+@media (max-width: 560px) {
+  body.app-active .mobile-nav { display: flex; }
 }
 .mobile-nav-btn {
   display: flex;
