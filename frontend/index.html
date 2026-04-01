@@ -343,7 +343,7 @@
           <div class="user-role" id="sidebar-role">—</div>
         </div>
       </div>
-      <button class="btn btn-ghost btn-sm btn-full mt-2" onclick="signOut()" style="justify-content:center">
+      <button class="btn btn-ghost btn-sm btn-full mt-2" onclick="confirmSignOut()" style="justify-content:center">
         Sign Out
       </button>
     </div>
@@ -531,7 +531,7 @@
 
       <!-- Booking state -->
       <div id="mentor-booking">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px">
+        <div style="display:flex;flex-direction:column;gap:24px;max-width:680px;margin:0 auto">
 
           <!-- What you get -->
           <div class="card">
@@ -662,7 +662,7 @@
               <div class="form-group">
                 <label class="form-label">Location</label>
                 <div style="position:relative">
-                  <input type="text" class="form-input" id="p-location" placeholder="Type your location..." autocomplete="off" oninput="profileLocationAutocomplete(this.value)" />
+                  <input type="text" class="form-input" id="p-location" placeholder="Type a city..." autocomplete="off" oninput="profileLocationAutocomplete(this.value)" />
                   <div id="p-location-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:999;max-height:200px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px #00000060"></div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App // ─── SkillFor
 
+
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -108,7 +109,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     const btn = document.getElementById('login-btn');
     btn.disabled = true; btn.textContent = 'Signing in...';
     const { error } = await sb.auth.signInWithPassword({ email: emailVal, password: passVal });
-    if (error) { showError(errEl, error.message); btn.disabled = false; btn.textContent = 'Sign In'; }
+    if (error) {
+      const msg = error.message?.toLowerCase().includes('invalid') 
+        ? 'Incorrect email or password. Please try again.'
+        : error.message;
+      showError(errEl, msg); 
+      btn.disabled = false; 
+      btn.textContent = 'Sign In'; 
+    }
   });
 
   // Signup
@@ -846,7 +854,7 @@ function renderPastAnalysesList() {
   const el = document.getElementById('past-analyses');
   if (!el) return;
   const analyses = appState.pastAnalyses || [];
-  if (!analyses.length) { el.innerHTML = ''; return; }
+  if (analyses.length <= 1) { el.innerHTML = ''; return; }
 
   let html = '<div class="card" style="margin-bottom:0">';
   html += '<div class="card-title" style="margin-bottom:12px">📋 Past Analyses</div>';
@@ -855,10 +863,10 @@ function renderPastAnalysesList() {
     const date = new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
    html += `
 <div id="past-item-${a.id}" 
-style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" 
-onclick="openPastAnalysis('${a.id}')" 
-onmouseenter="this.style.borderColor='var(--border2)'" 
-onmouseleave="this.style.borderColor='transparent'">
+     style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s"
+     onclick="openPastAnalysis('${a.id}')"
+     onmouseenter="this.style.borderColor='var(--border2)'"
+     onmouseleave="this.style.borderColor='transparent'">
 `;
     html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
     html += '<div style="flex:1;min-width:0">';
@@ -866,13 +874,12 @@ onmouseleave="this.style.borderColor='transparent'">
     html += '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + date + '</div>';
     html += '</div>';
     html += '<span style="font-weight:700;font-size:14px;color:' + color + ';flex-shrink:0">' + a.match_score + '%</span>';
-    html += `
-<button 
-onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')" 
-style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s" 
-onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'" 
-onmouseleave="this.style.background='none';this.style.color='var(--text3)'" 
-title="Delete">🗑</button>
+   html += `
+<button onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')"
+        style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s"
+        onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'"
+        onmouseleave="this.style.background='none';this.style.color='var(--text3)'"
+        title="Delete">🗑</button>
 `;
     html += '</div>';
     html += '</div>';
@@ -888,6 +895,23 @@ function openPastAnalysis(id) {
   document.querySelectorAll('[id^="past-item-"]').forEach(el => el.style.borderColor = 'transparent');
   const item = document.getElementById('past-item-' + id);
   if (item) item.style.borderColor = 'var(--accent)';
+  // Restore job input
+  const jp = document.getElementById('job-profile-input');
+  if (jp) jp.value = a.target_position;
+  // Show previously selected skills if stored
+  const skills = a.current_skills || [];
+  if (skills.length) {
+    const step2 = document.getElementById('step2-card');
+    if (step2) step2.style.display = '';
+    // Render read-only skill chips showing what was selected
+    const container = document.getElementById('job-skills-container');
+    if (container) {
+      container.innerHTML = '<div class="text-xs text-muted" style="margin-bottom:10px">Skills selected during this analysis:</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+        skills.map(s => '<span class="skill-chip" style="background:var(--accent-glow);border-color:var(--accent);color:var(--accent2)">' + escHtml(s) + '</span>').join('') +
+        '</div>';
+    }
+  }
   // Show result
   renderAnalysis(a, a.target_position);
   // Scroll to result
