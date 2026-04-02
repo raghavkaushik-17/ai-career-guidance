@@ -235,15 +235,15 @@ html, body {
 /* Hide text elements when collapsed */
 .sidebar.collapsed .logo-text,
 .sidebar.collapsed .sidebar-section-title,
+.sidebar.collapsed .nav-label,
 .sidebar.collapsed .user-info,
 .sidebar.collapsed .sidebar-footer > button,
 .sidebar.collapsed .sidebar-logo-wrap { display: none !important; }
-/* Hide nav item text but keep icon */
-.sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; gap: 0; width: 56px; }
-.sidebar.collapsed .nav-item span:last-child { display: none !important; }
-/* Center user card icon */
+/* Center nav items showing only icon */
+.sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; gap: 0; }
+/* Center user card */
 .sidebar.collapsed .user-card { justify-content: center; padding: 10px 0; gap: 0; }
-/* Center logo bar, show only toggle */
+/* Center logo bar */
 .sidebar.collapsed .sidebar-logo-bar { justify-content: center; padding: 14px 0; }
 
 .sidebar-logo-bar {

@@ -30,7 +30,7 @@
 <div id="landing-screen">
 
   <nav class="land-nav">
-    <div class="land-logo">
+    <div class="land-logo" onclick="window.location.reload()" style="cursor:pointer" title="Reload">
       <img src="skillforge-icon.svg" style="width:36px;height:28px"/>
       <span>SkillForge AI</span>
     </div>
@@ -331,7 +331,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo-bar">
-      <div class="sidebar-logo-wrap" onclick="goToLanding()" title="Back to home">
+      <div class="sidebar-logo-wrap" onclick="goToLanding()" title="Back to home" style="cursor:pointer">
         <img src="skillforge-icon.svg" style="width:40px;height:32px;flex-shrink:0"/>
         <span class="logo-text">SkillForge AI</span>
       </div>
@@ -341,19 +341,19 @@
     <nav class="sidebar-nav">
       <div class="sidebar-section-title">Navigation</div>
       <button class="nav-item active" data-page="chat">
-        <span class="icon">💬</span> AI Advisor
+        <span class="icon">💬</span><span class="nav-label">AI Advisor</span>
       </button>
       <button class="nav-item" data-page="jobs">
-        <span class="icon">💼</span> Job Matches
+        <span class="icon">💼</span><span class="nav-label">Job Matches</span>
       </button>
       <button class="nav-item" data-page="skills">
-        <span class="icon">📊</span> Skill Gap
+        <span class="icon">📊</span><span class="nav-label">Skill Gap</span>
       </button>
       <button class="nav-item" data-page="mentor">
-        <span class="icon">🎓</span> Mentorship
+        <span class="icon">🎓</span><span class="nav-label">Mentorship</span>
       </button>
       <button class="nav-item" data-page="profile">
-        <span class="icon">👤</span> Profile
+        <span class="icon">👤</span><span class="nav-label">Profile</span>
       </button>
     </nav>
 
