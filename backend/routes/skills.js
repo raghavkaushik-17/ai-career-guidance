@@ -119,7 +119,7 @@ router.post('/gap-analysis', async (req, res) => {
     try {
       return await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 1500,
+        max_completion_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]
       });
     } catch(e) {
@@ -213,7 +213,7 @@ Include 6-10 technical skills, 3-5 soft skills, 3-6 tools/platforms specific to 
   try {
     const response = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
-      max_tokens: 500,
+      max_completion_tokens: 500,
       messages: [{ role: 'user', content: prompt }]
     });
     const raw = response.choices[0].message.content;
