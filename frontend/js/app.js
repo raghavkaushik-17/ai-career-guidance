@@ -5,8 +5,6 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // ─── SkillForge AI Frontend App // ─── SkillFor
 
 
-
-
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -911,8 +909,16 @@ async function runGapAnalysis() {
       renderPastAnalysesList();
     }
   } catch(err) {
-    toast(err.message || 'Analysis failed. Please try again.', 'error');
-    if (resultEl) resultEl.innerHTML = '';
+    const msg = err.message || 'Analysis failed';
+    const isRate = msg.toLowerCase().includes('busy') || msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('429');
+    toast(isRate ? '⏳ AI is busy — please wait a few seconds and try again.' : msg, 'error');
+    if (resultEl) resultEl.innerHTML =
+      '<div class="empty-state">' +
+      '<div class="empty-state-icon">' + (isRate ? '⏳' : '⚠️') + '</div>' +
+      '<div class="empty-state-title">' + (isRate ? 'AI is busy' : 'Analysis failed') + '</div>' +
+      '<p class="text-sm text-muted">' + (isRate ? 'The AI is handling too many requests. Wait a few seconds and try again.' : msg) + '</p>' +
+      '<button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="runGapAnalysis()">Try Again</button>' +
+      '</div>';
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '🔍 Analyze My Skill Gap'; }
   }

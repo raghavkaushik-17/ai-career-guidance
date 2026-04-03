@@ -57,6 +57,9 @@ router.delete('/mine/:skillId', async (req, res) => {
 
 // POST /api/skills/gap-analysis - AI-powered skill gap analysis
 router.post('/gap-analysis', async (req, res) => {
+  // Set a 55s timeout so we respond before Render kills the request
+  req.setTimeout(55000);
+  res.setTimeout(55000);
   const { target_position, selected_skills } = req.body;
   if (!target_position) return res.status(400).json({ error: 'target_position required' });
 
@@ -159,8 +162,13 @@ router.post('/gap-analysis', async (req, res) => {
     if (saveError) console.error('Save error:', saveError);
     res.json({ ...analysis, id: saved?.id });
   } catch (err) {
-    console.error('Skill gap analysis error:', err);
-    res.status(500).json({ error: 'Analysis failed. Please try again.' });
+    const msg = err?.error?.message || err?.message || String(err);
+    console.error('Skill gap analysis error:', msg);
+    // Return specific message for rate limit
+    if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('429')) {
+      return res.status(429).json({ error: 'AI is busy right now. Please wait a few seconds and try again.' });
+    }
+    res.status(500).json({ error: 'Analysis failed: ' + msg });
   }
 });
 
@@ -215,8 +223,12 @@ Include 6-10 technical skills, 3-5 soft skills, 3-6 tools/platforms specific to 
     catch { const m = raw.match(/\{[\s\S]*\}/); skills = m ? JSON.parse(m[0]) : { technical: [], soft: [], tools: [] }; }
     res.json(skills);
   } catch (err) {
-    console.error('Skills for job error:', err);
-    res.status(500).json({ error: 'Could not fetch skills for this job' });
+    const msg = err?.error?.message || err?.message || String(err);
+    console.error('Skills for job error:', msg);
+    if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('429')) {
+      return res.status(429).json({ error: 'AI is busy. Please wait a moment and try again.' });
+    }
+    res.status(500).json({ error: 'Could not fetch skills: ' + msg });
   }
 });
 
