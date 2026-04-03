@@ -1121,6 +1121,14 @@ function renderAnalysis(a, role) {
       '</div>' +
     '</div>';
 
+    // scroll to analysis after render
+setTimeout(() => {
+  _arEl.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}, 50);
+
   const scoreEl = document.getElementById('match-score');
 const ringEl = document.getElementById('score-ring');
 
