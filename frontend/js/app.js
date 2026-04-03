@@ -917,7 +917,9 @@ async function runGapAnalysis() {
       '<span>Analyzing skill gap for ' + escHtml(job) + '...</span>' +
       '</div>';
 
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}, 50);
   }
 
  
