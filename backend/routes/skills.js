@@ -132,13 +132,36 @@ router.post('/gap-analysis', async (req, res) => {
     const response = await attemptAnalysis();
 
     const rawText = response.choices[0].message.content;
-    let analysis;
-    try {
-      analysis = JSON.parse(rawText);
-    } catch {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : { summary: rawText, match_score: 50, missing_skills: [], recommendations: [] };
+let analysis;
+
+try {
+  analysis = JSON.parse(rawText);
+} catch {
+  try {
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      let cleaned = jsonMatch[0];
+
+      // Fix unquoted summary (common issue)
+      cleaned = cleaned.replace(
+        /"summary":\s*([^",\n]+)(?=,)/,
+        (m, p1) => `"summary": "${p1.trim()}"`
+      );
+
+      analysis = JSON.parse(cleaned);
+    } else {
+      throw new Error("No JSON found");
     }
+  } catch (e) {
+    console.error("JSON parse fallback failed:", rawText);
+    analysis = {
+      summary: rawText,
+      match_score: 50,
+      missing_skills: [],
+      recommendations: []
+    };
+  }
+}
 
     // Ensure match_score is a number
     analysis.match_score = parseInt(analysis.match_score) || 50;
