@@ -1121,12 +1121,16 @@ function renderAnalysis(a, role) {
       '</div>' +
     '</div>';
 
-    // scroll to analysis after render
+   
 setTimeout(() => {
-  _arEl.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+  const scoreSection = document.querySelector('.analysis-header');
+
+  if (scoreSection) {
+    scoreSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
 }, 50);
 
   const scoreEl = document.getElementById('match-score');
