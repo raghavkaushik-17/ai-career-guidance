@@ -1046,7 +1046,6 @@ function rerunAnalysis(role) {
 
 
 function renderAnalysis(a, role) {
-  const deg = Math.round((a.match_score / 100) * 360);
   const sc = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
 
   const missingHTML = (a.missing_skills || []).map(s => {
@@ -1077,6 +1076,7 @@ function renderAnalysis(a, role) {
 
   const _arEl = document.getElementById('analysis-result');
   if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
+
   _arEl.innerHTML =
     '<div class="analysis-result">' +
       '<div style="display:flex;justify-content:flex-end;margin-bottom:12px">' +
@@ -1084,8 +1084,8 @@ function renderAnalysis(a, role) {
       '</div>' +
       '<div class="analysis-header">' +
         '<div class="score-ring-wrap">' +
-          '<div class="score-ring" style="background:conic-gradient(' + sc + ' ' + deg + 'deg,var(--bg3) 0deg)">' +
-            '<span class="score-value" style="color:' + sc + '">' + a.match_score + '%</span>' +
+          '<div class="score-ring" id="score-ring" style="background:conic-gradient(' + sc + ' 0deg,var(--bg3) 0deg)">' +
+            '<span id="match-score" class="score-value" style="color:' + sc + '">0%</span>' +
           '</div>' +
           '<span class="text-xs text-muted">Match score</span>' +
         '</div>' +
@@ -1101,6 +1101,38 @@ function renderAnalysis(a, role) {
         (a.roadmap ? '<div class="analysis-section"><div class="analysis-section-title">🗺️ Learning Roadmap</div><p class="text-sm" style="color:var(--text2);line-height:1.8">' + escHtml(a.roadmap) + '</p></div>' : '') +
       '</div>' +
     '</div>';
+
+  // scroll
+  setTimeout(() => {
+    _arEl.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 50);
+
+  // animate
+  const scoreEl = document.getElementById('match-score');
+  const ringEl = document.getElementById('score-ring');
+
+  if (scoreEl && ringEl) {
+    setTimeout(() => {
+      animateScore(scoreEl, a.match_score);
+
+      let current = 0;
+      const target = a.match_score;
+
+      const ringInterval = setInterval(() => {
+        current++;
+        const d = Math.round((current / 100) * 360);
+
+        ringEl.style.background =
+          'conic-gradient(' + sc + ' ' + d + 'deg,var(--bg3) 0deg)';
+
+        if (current >= target) clearInterval(ringInterval);
+      }, 10);
+
+    }, 400);
+  }
 }
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
