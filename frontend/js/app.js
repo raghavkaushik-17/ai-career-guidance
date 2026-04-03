@@ -3,6 +3,7 @@
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App // ─── SkillFor
+// ─── CareerAI Frontend App ───────────
 
 
 const { createClient } = supabase;
@@ -1793,4 +1794,126 @@ window.mobileNav = mobileNav;
   } else {
     initReveal();
   }
+})();
+// ══════════════════════════════════════════════════════════════
+// SKILLFORGE AI — ADVANCED ANIMATION ENGINE
+// ══════════════════════════════════════════════════════════════
+
+(function() {
+
+  // ── 1. SCROLL PROGRESS BAR ──────────────────────────────────
+  function updateScrollProgress() {
+    const el = document.getElementById('scroll-progress');
+    if (!el) return;
+    const landing = document.getElementById('landing-screen');
+    if (!landing || landing.style.display === 'none') { el.style.width = '0'; return; }
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    el.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateScrollProgress, { passive: true });
+
+  // ── 2. SCROLL REVEAL (IntersectionObserver) ──────────────────
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  function initReveal() {
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale')
+      .forEach(el => revealObserver.observe(el));
+  }
+  document.addEventListener('DOMContentLoaded', initReveal);
+  // Re-run if landing page shown
+  window.addEventListener('landingShown', initReveal);
+
+  // ── 3. RIPPLE EFFECT ON BUTTONS ──────────────────────────────
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn, .land-btn-hero, .land-btn-primary, .land-btn-ghost');
+    if (!btn) return;
+    const r = document.createElement('span');
+    r.className = 'btn-ripple';
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    btn.appendChild(r);
+    r.addEventListener('animationend', () => r.remove());
+  });
+
+  // ── 4. PARALLAX ON HERO VISUAL ───────────────────────────────
+  window.addEventListener('mousemove', function(e) {
+    const hero = document.querySelector('.land-hero-visual');
+    if (!hero) return;
+    const xPct = (e.clientX / window.innerWidth - 0.5) * 2;
+    const yPct = (e.clientY / window.innerHeight - 0.5) * 2;
+    hero.style.transform = `perspective(1200px) rotateY(${xPct * -3}deg) rotateX(${yPct * 2}deg)`;
+    // Move orbs slightly
+    document.querySelectorAll('.land-orb').forEach((orb, i) => {
+      const factor = (i + 1) * 8;
+      orb.style.transform = `translate(${xPct * factor}px, ${yPct * factor}px)`;
+    });
+  }, { passive: true });
+
+  // Reset on mouse leave
+  document.querySelector('.land-hero')?.addEventListener('mouseleave', function() {
+    const hero = document.querySelector('.land-hero-visual');
+    if (hero) hero.style.transform = '';
+    document.querySelectorAll('.land-orb').forEach(orb => orb.style.transform = '');
+  });
+
+  // ── 5. ANIMATED COUNTER (SOCIAL PROOF) ───────────────────────
+  function animateCounter(el, target, suffix = '') {
+    let start = 0;
+    const duration = 1500;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      el.textContent = Math.round(ease * target).toLocaleString() + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Observe the proof text for counter animation
+  const proofObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const strong = entry.target.querySelector('strong');
+        if (strong && strong.textContent.includes('2,400')) {
+          animateCounter(strong, 2400, '+');
+        }
+        proofObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const proof = document.querySelector('.land-social-proof');
+    if (proof) proofObserver.observe(proof);
+  });
+
+  // ── 6. PAGE TRANSITION BETWEEN DASHBOARD PAGES ───────────────
+  const origNavigateTo = window.navigateTo;
+  if (origNavigateTo) {
+    window.navigateTo = function(page) {
+      const current = document.querySelector('.page.active');
+      if (current) {
+        current.style.animation = 'none';
+      }
+      origNavigateTo(page);
+    };
+  }
+
+  // ── 7. TYPING CURSOR BLINK ON CHAT INPUT ─────────────────────
+  const chatInput = document.getElementById('chat-input');
+  if (chatInput) {
+    chatInput.addEventListener('focus', () => chatInput.style.caretColor = '#7c6fff');
+  }
+
 })();

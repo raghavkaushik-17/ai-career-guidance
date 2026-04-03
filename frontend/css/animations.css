@@ -1,0 +1,565 @@
+/* ══════════════════════════════════════════════════════════════
+   SKILLFORGE AI — ADVANCED ANIMATION SYSTEM
+   Covers: ambient bg, scroll reveal, morphing, liquid, glassmorphic,
+   microinteractions, hover effects, skeleton loading, page transitions,
+   expressive typography, gradient animations, self-drawing SVG,
+   faux-3D, neumorphic, claymorphic, animated icons & logo
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. AMBIENT BACKGROUND MOTION ───────────────────────────── */
+.land-hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Animated gradient mesh */
+.land-hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #7c5cfc08 0deg,
+    #3b82f608 90deg,
+    #10b98108 180deg,
+    #7c5cfc08 360deg
+  );
+  animation: meshRotate 20s linear infinite;
+}
+@keyframes meshRotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Floating noise particles */
+.land-hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(124,92,252,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(59,130,246,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(16,185,129,0.04) 0%, transparent 60%);
+  animation: ambientShift 8s ease-in-out infinite alternate;
+}
+@keyframes ambientShift {
+  0%   { opacity: 0.6; transform: scale(1) translate(0,0); }
+  50%  { opacity: 1;   transform: scale(1.05) translate(-10px, 5px); }
+  100% { opacity: 0.8; transform: scale(0.98) translate(10px, -8px); }
+}
+
+/* ── 2. ANIMATED GRADIENT HERO HEADING ───────────────────────── */
+.land-heading-accent {
+  background: linear-gradient(
+    135deg,
+    #7c5cfc 0%,
+    #a78bfa 25%,
+    #60a5fa 50%,
+    #34d399 75%,
+    #7c5cfc 100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 4s ease infinite;
+}
+@keyframes gradientFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── 3. EXPRESSIVE TYPOGRAPHY ANIMATION ─────────────────────── */
+.land-heading {
+  animation: headingReveal 1s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes headingReveal {
+  from { opacity: 0; transform: translateY(30px) skewY(2deg); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0) skewY(0); filter: blur(0); }
+}
+.land-subheading {
+  animation: headingReveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+}
+.land-badge {
+  animation: badgePop 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+}
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(0.7) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── 4. GLASSMORPHIC CARDS ───────────────────────────────────── */
+.land-card-float {
+  background: rgba(255,255,255,0.04) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.4s ease;
+}
+.land-card-float:hover {
+  transform: translateY(-8px) rotate(-1deg) scale(1.02);
+  box-shadow:
+    0 24px 60px rgba(124,92,252,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* ── 5. CLAYMORPHIC BUTTONS ──────────────────────────────────── */
+.land-btn-hero {
+  background: linear-gradient(135deg, #7c5cfc, #a78bfa) !important;
+  box-shadow:
+    0 4px 0 #5b3fd4,
+    0 8px 24px rgba(124,92,252,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.2) !important;
+  border-radius: 14px !important;
+  transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1) !important;
+  position: relative;
+  overflow: hidden;
+}
+.land-btn-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  border-radius: inherit;
+}
+.land-btn-hero:hover {
+  transform: translateY(-3px) !important;
+  box-shadow:
+    0 7px 0 #5b3fd4,
+    0 16px 40px rgba(124,92,252,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.25) !important;
+}
+.land-btn-hero:active {
+  transform: translateY(2px) !important;
+  box-shadow:
+    0 2px 0 #5b3fd4,
+    0 4px 12px rgba(124,92,252,0.3) !important;
+}
+
+/* ── 6. LIQUID MORPHING ORB ──────────────────────────────────── */
+.land-orb {
+  border-radius: 50%;
+  filter: blur(80px);
+  position: absolute;
+  animation: liquidMorph 8s ease-in-out infinite;
+}
+@keyframes liquidMorph {
+  0%,100% { border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; transform: translate(0,0) scale(1); }
+  25%      { border-radius: 40% 60% 30% 70% / 60% 40% 60% 40%; transform: translate(10px,-15px) scale(1.05); }
+  50%      { border-radius: 70% 30% 60% 40% / 40% 70% 30% 60%; transform: translate(-8px,10px) scale(0.95); }
+  75%      { border-radius: 30% 70% 40% 60% / 70% 30% 70% 30%; transform: translate(15px,5px) scale(1.02); }
+}
+
+/* ── 7. SELF-DRAWING SVG LINES ───────────────────────────────── */
+.land-draw-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 2s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+}
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── 8. FAUX 3D MOCKUP ───────────────────────────────────────── */
+.land-mockup {
+  transform: perspective(1000px) rotateY(-8deg) rotateX(4deg);
+  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  transform-style: preserve-3d;
+}
+.land-mockup:hover {
+  transform: perspective(1000px) rotateY(-2deg) rotateX(1deg) scale(1.02);
+}
+/* Depth shadow */
+.land-mockup::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 5%;
+  width: 90%;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(124,92,252,0.3) 0%, transparent 70%);
+  filter: blur(12px);
+  animation: shadowPulse 3s ease-in-out infinite;
+}
+@keyframes shadowPulse {
+  0%,100% { opacity: 0.6; transform: scaleX(1); }
+  50%      { opacity: 1; transform: scaleX(1.05); }
+}
+
+/* ── 9. MORPHING FEATURE ICONS ───────────────────────────────── */
+.land-feature-icon {
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), border-radius 0.5s ease;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+.land-feature-card:nth-child(2) .land-feature-icon { animation-delay: 0.3s; }
+.land-feature-card:nth-child(3) .land-feature-icon { animation-delay: 0.6s; }
+.land-feature-card:nth-child(4) .land-feature-icon { animation-delay: 0.9s; }
+@keyframes iconFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-5px) rotate(3deg); }
+}
+.land-feature-card:hover .land-feature-icon {
+  transform: translateY(-8px) scale(1.15) rotate(-5deg) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 12px 32px rgba(124,92,252,0.4);
+}
+
+/* ── 10. SCROLL REVEAL SYSTEM ────────────────────────────────── */
+.reveal, .reveal-left, .reveal-right, .reveal-scale {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.reveal.visible {
+  animation: revealUp 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+.reveal-left.visible {
+  animation: revealLeft 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+.reveal-right.visible {
+  animation: revealRight 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+.reveal-scale.visible {
+  animation: revealScale 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes revealUp    { from { opacity:0; transform:translateY(50px) }  to { opacity:1; transform:translateY(0) } }
+@keyframes revealLeft  { from { opacity:0; transform:translateX(-40px) } to { opacity:1; transform:translateX(0) } }
+@keyframes revealRight { from { opacity:0; transform:translateX(40px) }  to { opacity:1; transform:translateX(0) } }
+@keyframes revealScale { from { opacity:0; transform:scale(0.88) }        to { opacity:1; transform:scale(1) } }
+.reveal-d1.visible { animation-delay: 0.05s; }
+.reveal-d2.visible { animation-delay: 0.15s; }
+.reveal-d3.visible { animation-delay: 0.25s; }
+.reveal-d4.visible { animation-delay: 0.35s; }
+.reveal-d5.visible { animation-delay: 0.45s; }
+
+/* ── 11. MICROINTERACTIONS — NAV ─────────────────────────────── */
+.land-nav-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+.land-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, #7c5cfc, #60a5fa);
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.land-nav-link:hover::after { width: 100%; }
+
+/* ── 12. ANIMATED GRADIENT SECTION BORDERS ───────────────────── */
+.land-section-inner {
+  position: relative;
+}
+.land-section-label {
+  position: relative;
+  display: inline-block;
+}
+.land-section-label::before {
+  content: '';
+  position: absolute;
+  inset: -4px -12px;
+  background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(59,130,246,0.1));
+  border-radius: 20px;
+  filter: blur(8px);
+  animation: labelGlow 2s ease-in-out infinite alternate;
+}
+@keyframes labelGlow {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
+/* ── 13. NEUMORPHIC STEP NUMBERS ─────────────────────────────── */
+.land-step-num {
+  background: linear-gradient(145deg, #1a1a28, #111118);
+  box-shadow:
+    4px 4px 10px rgba(0,0,0,0.5),
+    -2px -2px 8px rgba(255,255,255,0.03),
+    inset 0 0 0 1px rgba(124,92,252,0.2);
+  transition: box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.land-step:hover .land-step-num {
+  box-shadow:
+    6px 6px 16px rgba(0,0,0,0.6),
+    -3px -3px 10px rgba(255,255,255,0.04),
+    inset 0 0 0 1px rgba(124,92,252,0.5),
+    0 0 20px rgba(124,92,252,0.3);
+  transform: scale(1.08);
+}
+
+/* ── 14. LOADING SKELETON SCREENS ────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── 15. PAGE TRANSITION ─────────────────────────────────────── */
+.page.active {
+  animation: pageEnter 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── 16. ANIMATED LOGO ICON ──────────────────────────────────── */
+.sidebar-logo-wrap img,
+.auth-logo img,
+.land-logo img {
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), filter 0.3s ease;
+}
+.sidebar-logo-wrap:hover img,
+.land-logo:hover img {
+  transform: rotate(15deg) scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(124,92,252,0.6));
+}
+
+/* ── 17. MICROINTERACTIONS — BUTTONS ─────────────────────────── */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s ease;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.btn:active::after {
+  background: rgba(255,255,255,0.08);
+}
+
+/* Ripple on click */
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(255,255,255,0.15);
+  animation: ripple 0.5s linear;
+  pointer-events: none;
+}
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── 18. ANIMATED HERO STATS (FLIPBOOK STYLE) ────────────────── */
+.land-card-float-val {
+  animation: flipIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  animation-delay: calc(var(--i, 0) * 0.2s);
+}
+@keyframes flipIn {
+  from { opacity: 0; transform: rotateX(-90deg) translateY(10px); }
+  to   { opacity: 1; transform: rotateX(0) translateY(0); }
+}
+
+/* ── 19. HOVER GLOW CARDS (DEMO + TESTIMONIAL) ───────────────── */
+.land-demo-card {
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease;
+}
+.land-demo-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(124,92,252,0.4) !important;
+  box-shadow: 0 24px 60px rgba(124,92,252,0.15), 0 0 0 1px rgba(124,92,252,0.2) !important;
+}
+.land-testimonial {
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
+              border-color 0.4s ease,
+              box-shadow 0.4s ease;
+}
+.land-testimonial:hover {
+  transform: translateY(-8px);
+  border-color: rgba(124,92,252,0.3) !important;
+  box-shadow: 0 20px 48px rgba(0,0,0,0.3), 0 0 0 1px rgba(124,92,252,0.15) !important;
+}
+
+/* ── 20. AMBIENT GRID BACKGROUND ─────────────────────────────── */
+.land-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridScroll 20s linear infinite;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+@keyframes gridScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 60px 60px; }
+}
+
+/* ── 21. SCROLLYTELLING PROGRESS BAR ─────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #7c5cfc, #60a5fa, #34d399);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(124,92,252,0.6);
+}
+
+/* ── 22. FEATURE CARD — ANIMATED BORDER ON HOVER ─────────────── */
+.land-feature-card {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.4s ease !important;
+}
+.land-feature-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+
+  background: linear-gradient(135deg, #7c5cfc, #60a5fa, #34d399, #7c5cfc);
+  background-size: 300% 300%;
+
+  opacity: 0;
+  transition: opacity .4s ease;
+
+  z-index: -1;
+
+  animation: borderRotate 3s linear infinite paused;
+}
+
+.land-feature-card:hover::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+@keyframes borderRotate {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.land-feature-card:hover {
+  transform: translateY(-10px) !important;
+  box-shadow: 0 30px 60px rgba(124,92,252,0.2) !important;
+}
+
+/* ── 23. AVATAR STACK ANIMATION ──────────────────────────────── */
+.land-av {
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  animation: avatarBob 3s ease-in-out infinite;
+}
+.land-av:nth-child(1) { animation-delay: 0s; }
+.land-av:nth-child(2) { animation-delay: 0.3s; }
+.land-av:nth-child(3) { animation-delay: 0.6s; }
+.land-av:nth-child(4) { animation-delay: 0.9s; }
+@keyframes avatarBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+.land-avatars:hover .land-av {
+  transform: translateY(-6px) scale(1.1);
+}
+
+/* ── 24. COMPARE COLUMN GRADIENT BORDER ──────────────────────── */
+.land-compare-us {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.land-compare-us:hover { transform: scale(1.02); }
+.land-compare-us::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #7c5cfc44, #60a5fa44);
+  z-index: -1;
+  filter: blur(8px);
+  animation: glowPulse 2s ease-in-out infinite alternate;
+}
+@keyframes glowPulse {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
+/* ── 25. TOAST ANIMATION ─────────────────────────────────────── */
+.toast {
+  animation: toastSlide 0.4s cubic-bezier(0.34,1.56,0.64,1) both !important;
+}
+@keyframes toastSlide {
+  from { opacity:0; transform: translateX(100%) scale(0.8); }
+  to   { opacity:1; transform: translateX(0) scale(1); }
+}
+
+/* ── 26. NAV ITEM MICROINTERACTION ───────────────────────────── */
+.nav-item .icon {
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.nav-item:hover .icon {
+  transform: scale(1.3) rotate(-5deg);
+}
+.nav-item.active .icon {
+  transform: scale(1.15);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+@keyframes iconPulse {
+  0%,100% { transform: scale(1.15); }
+  50%      { transform: scale(1.25) rotate(5deg); }
+}
+
+/* ── 27. CTA SECTION ANIMATED BACKGROUND ─────────────────────── */
+.land-cta-section {
+  position: relative;
+  overflow: hidden;
+}
+.land-cta-section::before {
+  content: '';
+  position: absolute;
+  width: 800px; height: 800px;
+  background: conic-gradient(from 0deg, #7c5cfc22, #60a5fa22, #34d39922, #7c5cfc22);
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ctaSpin 12s linear infinite;
+  filter: blur(60px);
+  pointer-events: none;
+}
+@keyframes ctaSpin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ── 28. SCROLLYTELLING SECTION ACTIVE STATE ─────────────────── */
+.land-section {
+  transition: opacity 0.3s ease;
+}
+
+/* ── 29. INPUT FOCUS ANIMATION ───────────────────────────────── */
+.form-input:focus {
+  animation: inputFocus 0.3s ease both;
+}
+@keyframes inputFocus {
+  from { box-shadow: 0 0 0 0px rgba(124,92,252,0); }
+  to   { box-shadow: 0 0 0 3px rgba(124,92,252,0.25); }
+}
+
+/* ── 30. SIDEBAR COLLAPSE TRANSITION ─────────────────────────── */
+.sidebar {
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1) !important;
+}
+.nav-label {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.sidebar.collapsed .nav-label {
+  opacity: 0;
+  transform: translateX(-10px);
+}
