@@ -924,7 +924,7 @@ function renderPastAnalysesList() {
   analyses.forEach((a, i) => {
     const color = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
     const date = new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-   html += `
+    html += `
 <div id="past-item-${a.id}" 
 style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" 
 onclick="openPastAnalysis('${a.id}')" 
@@ -1032,6 +1032,9 @@ function renderAnalysis(a, role) {
   if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
   _arEl.innerHTML =
     '<div class="analysis-result">' +
+      '<div style="display:flex;justify-content:flex-end;margin-bottom:12px">' +
+        '<button class="btn btn-ghost btn-sm" onclick="resetSkillGap()" style="color:var(--text3)">↺ New Analysis</button>' +
+      '</div>' +
       '<div class="analysis-header">' +
         '<div class="score-ring-wrap">' +
           '<div class="score-ring" style="background:conic-gradient(' + sc + ' ' + deg + 'deg,var(--bg3) 0deg)">' +
@@ -1135,27 +1138,58 @@ window.saveProfile = saveProfile;
 window.rerunAnalysis = rerunAnalysis;
 window.renderAnalysis = renderAnalysis;
 
+function resetSkillGap() {
+  // Clear result and form
+  const ar = document.getElementById('analysis-result');
+  if (ar) { ar.innerHTML = ''; ar.removeAttribute('data-analysis-id'); }
+  const jp = document.getElementById('job-profile-input');
+  if (jp) jp.value = '';
+  const s2 = document.getElementById('step2-card');
+  if (s2) s2.style.display = 'none';
+  const container = document.getElementById('job-skills-container');
+  if (container) container.innerHTML = '';
+  // Deselect highlighted past analysis
+  document.querySelectorAll('[id^="past-item-"]').forEach(el => el.style.borderColor = 'transparent');
+  // Scroll to top of skills layout
+  document.querySelector('.skills-layout')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.resetSkillGap = resetSkillGap;
+
 // ─── MENTOR ───────────────────────────────────────────────────────────────────
+function renderMentorSession(session) {
+  const bookedEl = document.getElementById('mentor-booked');
+  const bookingEl = document.getElementById('mentor-booking');
+  if (bookedEl) bookedEl.style.display = '';
+  if (bookingEl) bookingEl.style.display = 'none';
+  const d = document.getElementById('mentor-session-details');
+  if (d) d.innerHTML =
+    '<div class="mentor-session-row"><span class="mentor-session-label">Status</span><span class="mentor-session-value" style="color:var(--green)">✅ Confirmed</span></div>' +
+    '<div class="mentor-session-row"><span class="mentor-session-label">Amount Paid</span><span class="mentor-session-value">₹' + session.amount + '</span></div>' +
+    '<div class="mentor-session-row"><span class="mentor-session-label">Payment ID</span><span class="mentor-session-value" style="font-size:11px">' + session.payment_id + '</span></div>' +
+    '<div class="mentor-session-row"><span class="mentor-session-label">Booked On</span><span class="mentor-session-value">' + new Date(session.created_at).toLocaleDateString() + '</span></div>';
+}
+
 async function loadMentorPage() {
   const bookedEl = document.getElementById('mentor-booked');
   const bookingEl = document.getElementById('mentor-booking');
+
+  // Show cached session instantly if available
+  if (appState.mentorSession) {
+    renderMentorSession(appState.mentorSession);
+    return;
+  }
+
+  // Default: show booking form while loading
   if (bookedEl) bookedEl.style.display = 'none';
   if (bookingEl) bookingEl.style.display = '';
 
-  // Try to check if already paid — silently ignore any errors
   try {
     const session = await api.getMentorSession();
     if (session && session.status === 'paid') {
-      if (bookedEl) bookedEl.style.display = '';
-      if (bookingEl) bookingEl.style.display = 'none';
-      const d = document.getElementById('mentor-session-details');
-      if (d) d.innerHTML =
-        '<div class="mentor-session-row"><span class="mentor-session-label">Status</span><span class="mentor-session-value" style="color:var(--green)">✅ Confirmed</span></div>' +
-        '<div class="mentor-session-row"><span class="mentor-session-label">Amount Paid</span><span class="mentor-session-value">₹' + session.amount + '</span></div>' +
-        '<div class="mentor-session-row"><span class="mentor-session-label">Payment ID</span><span class="mentor-session-value" style="font-size:11px">' + session.payment_id + '</span></div>' +
-        '<div class="mentor-session-row"><span class="mentor-session-label">Booked On</span><span class="mentor-session-value">' + new Date(session.created_at).toLocaleDateString() + '</span></div>';
+      appState.mentorSession = session;
+      renderMentorSession(session);
     }
-  } catch(e) { /* show booking form — already done above */ }
+  } catch(e) { /* show booking form */ }
 }
 
 async function startMentorPayment() {
@@ -1200,7 +1234,7 @@ async function startMentorPayment() {
             preferences: { goal, time, notes }
           });
           toast('🎉 Session booked! A mentor will contact you within 24 hours.', 'success');
-          loadMentorPage();
+          appState.mentorSession = null; loadMentorPage();
         } catch(err) {
           toast('Payment verification failed. Please contact support.', 'error');
           btn.disabled = false; btn.textContent = '💳 Book Session — ₹500';
