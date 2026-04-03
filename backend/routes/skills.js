@@ -112,12 +112,22 @@ router.post('/gap-analysis', async (req, res) => {
     '  "roadmap": "<3-6 month learning path>"\n' +
     '}';
 
+  const attemptAnalysis = async (attempt = 1) => {
+    try {
+      return await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1500,
+        timeout: 30000,
+        messages: [{ role: 'user', content: prompt }]
+      });
+    } catch(e) {
+      if (attempt < 2) { await new Promise(r => setTimeout(r, 1000)); return attemptAnalysis(attempt + 1); }
+      throw e;
+    }
+  };
+
   try {
-    const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }]
-    });
+    const response = await attemptAnalysis();
 
     const rawText = response.choices[0].message.content;
     let analysis;

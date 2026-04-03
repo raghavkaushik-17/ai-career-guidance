@@ -209,11 +209,17 @@ window.addEventListener('DOMContentLoaded', async () => {
 // ─── App Boot ─────────────────────────────────────────────────────────────────
 async function bootApp(user) {
   appState.user = user;
-  try { appState.profile = await api.getProfile(); } catch { appState.profile = null; }
-  updateSidebar();
+  // Show app immediately — don't wait for profile
   showApp();
-  loadChatSessions();
-  // Update location label on jobs toggle
+  updateSidebar();
+  // Load profile and sessions in parallel
+  const [profileResult] = await Promise.allSettled([
+    api.getProfile(),
+    loadChatSessions()
+  ]);
+  appState.profile = profileResult.status === 'fulfilled' ? profileResult.value : null;
+  updateSidebar();
+  // Update location label
   const locLabel = document.getElementById('loc-label');
   if (locLabel && appState.profile?.location) {
     locLabel.textContent = appState.profile.location.split(',')[0];
@@ -919,11 +925,11 @@ function renderPastAnalysesList() {
     const color = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
     const date = new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
    html += `
-<div id="past-item-${a.id}"
-     style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s"
-     onclick="openPastAnalysis('${a.id}')"
-     onmouseenter="this.style.borderColor='var(--border2)'"
-     onmouseleave="this.style.borderColor='transparent'">
+<div id="past-item-${a.id}" 
+style="padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" 
+onclick="openPastAnalysis('${a.id}')" 
+onmouseenter="this.style.borderColor='var(--border2)'" 
+onmouseleave="this.style.borderColor='transparent'">
 `;
     html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
     html += '<div style="flex:1;min-width:0">';
@@ -931,12 +937,13 @@ function renderPastAnalysesList() {
     html += '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + date + '</div>';
     html += '</div>';
     html += '<span style="font-weight:700;font-size:14px;color:' + color + ';flex-shrink:0">' + a.match_score + '%</span>';
-   html += `
-<button onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')"
-        style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s"
-        onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'"
-        onmouseleave="this.style.background='none';this.style.color='var(--text3)'"
-        title="Delete">🗑</button>
+    html += `
+<button 
+onclick="event.stopPropagation();confirmDeleteAnalysis('${a.id}')" 
+style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;flex-shrink:0;border-radius:6px;transition:background 0.15s" 
+onmouseenter="this.style.background='#f8717120';this.style.color='var(--red)'" 
+onmouseleave="this.style.background='none';this.style.color='var(--text3)'" 
+title="Delete">🗑</button>
 `;
     html += '</div>';
     html += '</div>';
