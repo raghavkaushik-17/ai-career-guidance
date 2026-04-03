@@ -881,18 +881,46 @@ async function addSkill() {}
 async function removeSkill(skillId) {}
 
 async function runGapAnalysis() {
+  const btn = document.getElementById('analyze-btn');
+  const originalText = btn.innerText;
+
+  btn.disabled = true;
+  btn.innerText = "Analyzing...";
+  btn.style.opacity = "0.7";
+
   const jobEl = document.getElementById('job-profile-input');
   const job = jobEl ? jobEl.value.trim() : '';
-  if (!job) { toast('Please enter a job profile first', 'error'); return; }
+
+  if (!job) {
+    toast('Please enter a job profile first', 'error');
+    btn.disabled = false;
+    btn.innerText = originalText;
+    btn.style.opacity = "1";
+    return;
+  }
+
   const selectedSkills = getSelectedSkills();
-  if (!selectedSkills.length) { toast('Please select at least one skill you have', 'error'); return; }
-  const btn = document.getElementById('analyze-btn');
+  if (!selectedSkills.length) {
+    toast('Please select at least one skill you have', 'error');
+    btn.disabled = false;
+    btn.innerText = originalText;
+    btn.style.opacity = "1";
+    return;
+  }
+
   const resultEl = document.getElementById('analysis-result');
-  if (btn) { btn.disabled = true; btn.textContent = 'Analyzing...'; }
+
   if (resultEl) {
-    resultEl.innerHTML = '<div class="loading-state"><div class="spinner"></div><span>Analyzing skill gap for ' + escHtml(job) + '...</span></div>';
+    resultEl.innerHTML =
+      '<div class="loading-state">' +
+      '<div class="spinner"></div>' +
+      '<span>Analyzing skill gap for ' + escHtml(job) + '...</span>' +
+      '</div>';
+
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+ 
   try {
     const a = await api.analyzeGapWithSkills(job, selectedSkills);
     renderAnalysis(a, job);
