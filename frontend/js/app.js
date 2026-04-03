@@ -5,6 +5,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // ─── SkillForge AI Frontend App // ─── SkillFor
 
 
+
+
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -896,7 +898,18 @@ async function runGapAnalysis() {
   try {
     const a = await api.analyzeGapWithSkills(job, selectedSkills);
     renderAnalysis(a, job);
-    loadPastAnalyses();
+    // Add to pastAnalyses immediately so list updates without waiting for API
+    if (a.id) {
+      const newEntry = {
+        id: a.id,
+        target_position: job,
+        match_score: a.match_score,
+        current_skills: (selectedSkills || []).map(s => s.name),
+        created_at: new Date().toISOString()
+      };
+      appState.pastAnalyses = [newEntry, ...(appState.pastAnalyses || [])];
+      renderPastAnalysesList();
+    }
   } catch(err) {
     toast(err.message || 'Analysis failed. Please try again.', 'error');
     if (resultEl) resultEl.innerHTML = '';
