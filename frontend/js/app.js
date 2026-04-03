@@ -960,6 +960,23 @@ async function loadPastAnalyses() {
   } catch(e) { console.warn('Could not load past analyses', e); }
 }
 
+function animateScore(el, target) {
+  let start = 0;
+  const duration = 900;
+  const startTime = performance.now();
+
+  function update(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease out
+    const value = Math.floor(eased * target);
+    el.textContent = value + "%";
+
+    if (progress < 1) requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+}
+
 function renderPastAnalysesList() {
   const el = document.getElementById('past-analyses');
   if (!el) return;
@@ -1077,6 +1094,7 @@ function renderAnalysis(a, role) {
 
   const _arEl = document.getElementById('analysis-result');
   if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
+
   _arEl.innerHTML =
     '<div class="analysis-result">' +
       '<div style="display:flex;justify-content:flex-end;margin-bottom:12px">' +
@@ -1085,7 +1103,7 @@ function renderAnalysis(a, role) {
       '<div class="analysis-header">' +
         '<div class="score-ring-wrap">' +
           '<div class="score-ring" style="background:conic-gradient(' + sc + ' ' + deg + 'deg,var(--bg3) 0deg)">' +
-            '<span class="score-value" style="color:' + sc + '">' + a.match_score + '%</span>' +
+            '<span id="match-score" class="score-value" style="color:' + sc + '">0%</span>' +
           '</div>' +
           '<span class="text-xs text-muted">Match score</span>' +
         '</div>' +
@@ -1101,6 +1119,9 @@ function renderAnalysis(a, role) {
         (a.roadmap ? '<div class="analysis-section"><div class="analysis-section-title">🗺️ Learning Roadmap</div><p class="text-sm" style="color:var(--text2);line-height:1.8">' + escHtml(a.roadmap) + '</p></div>' : '') +
       '</div>' +
     '</div>';
+
+  const scoreEl = document.getElementById('match-score');
+  if (scoreEl) animateScore(scoreEl, a.match_score);
 }
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
