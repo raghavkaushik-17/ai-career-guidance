@@ -120,7 +120,6 @@ router.post('/gap-analysis', async (req, res) => {
       return await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
         max_tokens: 1500,
-        timeout: 30000,
         messages: [{ role: 'user', content: prompt }]
       });
     } catch(e) {
