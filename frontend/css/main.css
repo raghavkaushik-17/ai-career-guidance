@@ -680,6 +680,12 @@ html, body {
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
 }
+.jobs-grid:has(.empty-state) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
 
 .job-card {
   background: var(--bg2);
@@ -890,10 +896,11 @@ a.resource-link:hover { background: var(--accent); color: #fff; text-decoration:
 
 .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: 12px;
-  padding: 60px; color: var(--text2); text-align: center;
+  padding: 60px 40px; color: var(--text2); text-align: center;
+  width: 100%; max-width: 400px; margin: 0 auto;
 }
-.empty-state-icon { font-size: 40px; }
-.empty-state-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text); }
+.empty-state-icon { font-size: 48px; }
+.empty-state-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
 
 /* ─── UTILITIES ─── */
 .flex { display: flex; }
@@ -1613,4 +1620,90 @@ a.resource-link:hover { background: var(--accent); color: #fff; text-decoration:
   .land-testimonials { grid-template-columns: 1fr; }
   .land-compare-grid { grid-template-columns: 1fr; }
   .land-demo-card { padding: 20px; }
+}
+
+/* ─── SCROLL ANIMATIONS ─── */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes revealLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes revealRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes revealScale {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Elements start hidden */
+.reveal {
+  opacity: 0;
+}
+.reveal.visible {
+  animation: revealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.reveal-left.visible {
+  animation: revealLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.reveal-right.visible {
+  animation: revealRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.reveal-scale.visible {
+  animation: revealScale 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Stagger delays */
+.reveal-d1 { animation-delay: 0.05s !important; }
+.reveal-d2 { animation-delay: 0.15s !important; }
+.reveal-d3 { animation-delay: 0.25s !important; }
+.reveal-d4 { animation-delay: 0.35s !important; }
+.reveal-d5 { animation-delay: 0.45s !important; }
+
+/* Feature cards hover lift */
+.land-feature-card {
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+.land-feature-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 24px 48px rgba(124,92,252,0.15) !important;
+}
+
+/* Step hover */
+.land-step {
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.land-step:hover {
+  transform: translateY(-4px);
+}
+
+/* Testimonial hover */
+.land-testimonial {
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease;
+}
+.land-testimonial:hover {
+  transform: translateY(-6px);
+  border-color: rgba(124,92,252,0.3);
+}
+
+/* Demo card entrance */
+.land-demo-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.land-demo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.3);
+}
+
+/* Section label pulse */
+.land-section-label {
+  animation: countUp 0.5s ease both;
 }
