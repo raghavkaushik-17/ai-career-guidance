@@ -105,15 +105,18 @@ router.post('/gap-analysis', async (req, res) => {
     'Task: Analyze how ready they are for the ' + target_position + ' role. Write everything in second person — use "you", "your", "you have", "you need" instead of "the user" or "they".\n' +
     'The match_score MUST be calculated based on what % of required skills for ' + target_position + ' they already have.\n' +
     'If skillsList has relevant skills, match_score should be 40-90. Only give 0-10 if they have NO relevant skills at all.\n\n' +
-    'Respond ONLY with this exact JSON structure, no markdown, no backticks:\n' +
-    '{\n' +
-    '  "match_score": <integer 0-100>,\n' +
-    '  "summary": "<2-3 sentences about readiness>",\n' +
-    '  "missing_skills": [{"skill": "<name>", "priority": "critical|important|nice_to_have", "reason": "<why needed>", "resources": ["<resource>"]}],\n' +
-    '  "strengths": ["<strength>"],\n' +
-    '  "recommendations": [{"title": "<action>", "description": "<steps>", "timeframe": "<duration>"}],\n' +
-    '  "roadmap": "<3-6 month learning path>"\n' +
-    '}';
+   'Respond ONLY with valid JSON.\n' +
+'Do NOT write text before or after JSON.\n' +
+'All string values MUST be wrapped in double quotes.\n' +
+'No markdown, no backticks.\n' +
+'{\n' +
+'  "match_score": <integer 0-100>,\n' +
+'  "summary": "<2-3 sentences about readiness>",\n' +
+'  "missing_skills": [{"skill": "<name>", "priority": "critical|important|nice_to_have", "reason": "<why needed>", "resources": ["<resource>"]}],\n' +
+'  "strengths": ["<strength>"],\n' +
+'  "recommendations": [{"title": "<action>", "description": "<steps>", "timeframe": "<duration>"}],\n' +
+'  "roadmap": "<3-6 month learning path>"\n' +
+'}';
 
   const attemptAnalysis = async (attempt = 1) => {
     try {
