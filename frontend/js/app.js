@@ -1030,6 +1030,23 @@ function openPastAnalysis(id) {
     document.getElementById('analysis-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
 }
+function animateScore(el, target) {
+  let current = 0;
+  const duration = 800;
+  const stepTime = 10;
+  const increment = target / (duration / stepTime);
+
+  const counter = setInterval(() => {
+    current += increment;
+
+    if (current >= target) {
+      current = target;
+      clearInterval(counter);
+    }
+
+    el.textContent = Math.round(current) + "%";
+  }, stepTime);
+}
 
 function confirmDeleteAnalysis(id) {
   const a = (appState.pastAnalyses || []).find(x => x.id === id);
