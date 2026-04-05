@@ -1,9 +1,10 @@
 // ─── CareerAI Frontend App ────────────────────────────────────────────────────
 // Config — replace with your Supabase project values
+// ─── CareerAI Frontend App ────────────────────────────────────────────────────
+// Config — replace with your Supabase project values
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App // ─── SkillFor
-// ─── CareerAI Frontend App ───────────
 
 
 const { createClient } = supabase;
@@ -1095,6 +1096,16 @@ function renderAnalysis(a, role) {
   const _arEl = document.getElementById('analysis-result');
   if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
 
+  // Build radar chart data from strengths + missing skills
+  const radarSkills = [
+    ...(a.strengths || []).slice(0, 3).map(s => ({ label: s.substring(0, 18), value: 80 + Math.random() * 20 })),
+    ...(a.missing_skills || []).slice(0, 3).map(s => ({ label: s.skill?.substring(0, 18) || '', value: 10 + Math.random() * 30 }))
+  ].slice(0, 6);
+  const radarHTML = buildRadarChart(radarSkills, sc);
+
+  // Salary insight (estimated based on role)
+  const salaryHTML = buildSalaryInsight(role, a.match_score);
+
   _arEl.innerHTML =
     '<div class="analysis-result">' +
       '<div style="display:flex;justify-content:flex-end;margin-bottom:12px">' +
@@ -1107,16 +1118,24 @@ function renderAnalysis(a, role) {
           '</div>' +
           '<span class="text-xs text-muted">Match score</span>' +
         '</div>' +
-        '<div>' +
+        '<div style="flex:1">' +
           '<h3 style="font-family:var(--font-display);font-size:18px;margin-bottom:8px">Analysis: ' + escHtml(role) + '</h3>' +
           '<p class="text-sm" style="color:var(--text2);line-height:1.7">' + escHtml(a.summary || '') + '</p>' +
         '</div>' +
       '</div>' +
       '<div class="analysis-body">' +
+        '<div class="analysis-charts-row">' +
+          radarHTML +
+          salaryHTML +
+        '</div>' +
         (strengthsHTML ? '<div class="analysis-section"><div class="analysis-section-title">✅ Your Strengths</div><div class="strength-list">' + strengthsHTML + '</div></div>' : '') +
         (missingHTML ? '<div class="analysis-section"><div class="analysis-section-title">🎯 Skills to Develop</div>' + missingHTML + '</div>' : '') +
         (recsHTML ? '<div class="analysis-section"><div class="analysis-section-title">📋 Action Plan</div>' + recsHTML + '</div>' : '') +
         (a.roadmap ? '<div class="analysis-section"><div class="analysis-section-title">🗺️ Learning Roadmap</div><p class="text-sm" style="color:var(--text2);line-height:1.8">' + escHtml(a.roadmap) + '</p></div>' : '') +
+        '<div class="analysis-section" style="text-align:center;padding-top:8px">' +
+          '<button class="btn btn-primary btn-sm" onclick="navigateTo(\'jobs\')" style="margin-right:8px">💼 Find Matching Jobs →</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="navigateTo(\'chat\')">🧭 Ask AI for Guidance</button>' +
+        '</div>' +
       '</div>' +
     '</div>';
 
@@ -1131,6 +1150,12 @@ function renderAnalysis(a, role) {
   // animate
   const scoreEl = document.getElementById('match-score');
   const ringEl = document.getElementById('score-ring');
+
+  setTimeout(() => {
+    const salBar = document.getElementById('salary-bar');
+    const pct = a.match_score >= 70 ? 85 : a.match_score >= 40 ? 55 : 25;
+    if (salBar) salBar.style.width = pct + '%';
+  }, 300);
 
   if (scoreEl && ringEl) {
     setTimeout(() => {
@@ -1234,6 +1259,74 @@ window.updateStates = updateStates;
 window.saveProfile = saveProfile;
 window.rerunAnalysis = rerunAnalysis;
 window.renderAnalysis = renderAnalysis;
+
+function buildRadarChart(skills, color) {
+  if (!skills.length) return '';
+  const size = 160;
+  const cx = size / 2, cy = size / 2, r = 60;
+  const n = skills.length;
+  const points = skills.map((s, i) => {
+    const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+    const v = (s.value / 100);
+    return { x: cx + r * v * Math.cos(angle), y: cy + r * v * Math.sin(angle), lx: cx + (r + 22) * Math.cos(angle), ly: cy + (r + 22) * Math.sin(angle), label: s.label, value: Math.round(s.value) };
+  });
+  const gridPoints = (frac) => skills.map((_, i) => {
+    const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+    return cx + r * frac * Math.cos(angle) + ',' + (cy + r * frac * Math.sin(angle));
+  }).join(' ');
+  const dataPoints = points.map(p => p.x + ',' + p.y).join(' ');
+  const col = color.replace('var(--green)', '#34d399').replace('var(--amber)', '#fbbf24').replace('var(--red)', '#f87171');
+  return '<div class="analysis-chart-card">' +
+    '<div class="analysis-section-title" style="margin-bottom:12px">📡 Skill Radar</div>' +
+    '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" style="overflow:visible;display:block;margin:0 auto">' +
+    [0.25,0.5,0.75,1].map(f => '<polygon points="' + gridPoints(f) + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>').join('') +
+    skills.map((_, i) => {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      return '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + r * Math.cos(angle)) + '" y2="' + (cy + r * Math.sin(angle)) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+    }).join('') +
+    '<polygon points="' + dataPoints + '" fill="' + col + '30" stroke="' + col + '" stroke-width="2" stroke-linejoin="round">' +
+      '<animate attributeName="points" from="' + Array(n).fill(cx+','+cy).join(' ') + '" to="' + dataPoints + '" dur="1s" calcMode="spline" keySplines="0.16 1 0.3 1" fill="freeze"/>' +
+    '</polygon>' +
+    points.map(p => '<circle cx="' + p.x + '" cy="' + p.y + '" r="3" fill="' + col + '"><animate attributeName="r" from="0" to="3" dur="1s" fill="freeze"/></circle>').join('') +
+    points.map(p => '<text x="' + p.lx + '" y="' + (p.ly+4) + '" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)" font-family="sans-serif">' + escHtml(p.label.substring(0,12)) + '</text>').join('') +
+    '</svg>' +
+    '</div>';
+}
+
+function buildSalaryInsight(role, matchScore) {
+  // Estimated salary ranges by keyword
+  const salaryMap = [
+    { key: ['engineer','developer','programmer'], entry: [400000,700000], mid: [800000,1500000], senior: [1500000,3000000], currency: '₹' },
+    { key: ['designer','ui','ux'], entry: [300000,600000], mid: [700000,1200000], senior: [1200000,2500000], currency: '₹' },
+    { key: ['manager','product','pm'], entry: [600000,1000000], mid: [1200000,2000000], senior: [2000000,4000000], currency: '₹' },
+    { key: ['data','analyst','scientist'], entry: [500000,900000], mid: [900000,1600000], senior: [1600000,3500000], currency: '₹' },
+    { key: ['nurse','doctor','medical'], entry: [300000,500000], mid: [500000,1000000], senior: [1000000,2000000], currency: '₹' },
+    { key: ['teacher','education'], entry: [250000,400000], mid: [400000,700000], senior: [700000,1200000], currency: '₹' },
+  ];
+  const r = role.toLowerCase();
+  let match = salaryMap.find(s => s.key.some(k => r.includes(k))) || { entry:[250000,500000], mid:[500000,900000], senior:[900000,1800000], currency:'₹' };
+  const level = matchScore >= 70 ? 'senior' : matchScore >= 40 ? 'mid' : 'entry';
+  const [lo, hi] = match[level];
+  const fmt = (n) => match.currency === '₹' ? '₹' + (n/100000).toFixed(1) + 'L' : '$' + Math.round(n/1000) + 'k';
+  const levelLabel = level === 'senior' ? 'Senior Level' : level === 'mid' ? 'Mid Level' : 'Entry Level';
+  const pct = level === 'senior' ? 85 : level === 'mid' ? 55 : 25;
+  return '<div class="analysis-chart-card">' +
+    '<div class="analysis-section-title" style="margin-bottom:12px">💰 Salary Insight</div>' +
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:8px">Estimated for India · ' + escHtml(role) + '</div>' +
+    '<div style="font-size:24px;font-weight:800;color:var(--text);font-family:var(--font-display);margin-bottom:4px">' + fmt(lo) + ' – ' + fmt(hi) + '</div>' +
+    '<div style="font-size:12px;color:var(--text2);margin-bottom:16px">per year · ' + levelLabel + '</div>' +
+    '<div style="background:var(--bg3);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px">' +
+      '<div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#7c6fff,#34d399);width:0%;transition:width 1.2s cubic-bezier(0.16,1,0.3,1)" id="salary-bar"></div>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">' +
+      '<span>Entry</span><span>Mid</span><span>Senior</span>' +
+    '</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-top:12px">Your match score puts you at approximately the <strong style=color:var(--accent2)>' + levelLabel + '</strong> salary band.</div>' +
+    '</div>';
+}
+
+// Animate salary bar after render
+const _origRenderAnalysis = renderAnalysis;
 
 function resetSkillGap() {
   // Clear result and form

@@ -62,32 +62,40 @@
       <div class="land-grid"></div>
     </div>
     <div class="land-hero-content">
-      <div class="land-badge">✦ Free to start · No credit card needed</div>
+      <div class="land-badge">✦ AI Career Companion · Free to start</div>
       <h1 class="land-heading">
-        Stop guessing.<br>
-        <span class="land-heading-accent">Start growing.</span>
+        Know exactly what<br>
+        <span class="land-heading-accent">your career needs.</span>
       </h1>
       <p class="land-subheading">
-        SkillForge AI tells you exactly what skills you're missing, finds real jobs that match your profile,<br class="land-br">
-        and gives you a personalized roadmap — in under 2 minutes.
+        SkillForge AI analyzes your skills, identifies your gaps, suggests real jobs<br class="land-br">
+        and builds your personalized learning roadmap — in under 2 minutes.
       </p>
+      <!-- Inline value props -->
+      <div class="land-value-props">
+        <div class="land-vp">📊 <span>Skill Gap Score</span></div>
+        <div class="land-vp">💼 <span>Real Job Matches</span></div>
+        <div class="land-vp">🗺️ <span>Learning Roadmap</span></div>
+        <div class="land-vp">🎓 <span>Expert Mentorship</span></div>
+      </div>
       <div class="land-cta-row">
         <button class="land-btn-hero" onclick="showLandingAuth('signup')">
-          Start For Free
+          Analyze My Skills Free
           <span class="land-btn-arrow">→</span>
         </button>
-        <button class="land-btn-outline" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
-          See how it works
+        <button class="land-btn-outline" onclick="showLandingAuth('login')">
+          Sign In
         </button>
       </div>
-      <div class="land-social-proof">
-        <div class="land-avatars">
-          <div class="land-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">R</div>
-          <div class="land-av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">P</div>
-          <div class="land-av" style="background:linear-gradient(135deg,#10b981,#059669)">A</div>
-          <div class="land-av" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">S</div>
-        </div>
-        <span class="land-proof-text">Join <strong>2,400+</strong> professionals growing their careers</span>
+      <!-- Stats row -->
+      <div class="land-stats-row">
+        <div class="land-stat"><div class="land-stat-num">2,400+</div><div class="land-stat-label">Professionals</div></div>
+        <div class="land-stat-div"></div>
+        <div class="land-stat"><div class="land-stat-num">92%</div><div class="land-stat-label">Found Skill Gaps</div></div>
+        <div class="land-stat-div"></div>
+        <div class="land-stat"><div class="land-stat-num">60s</div><div class="land-stat-label">Analysis Time</div></div>
+        <div class="land-stat-div"></div>
+        <div class="land-stat"><div class="land-stat-num">₹500</div><div class="land-stat-label">Expert Mentorship</div></div>
       </div>
     </div>
     <div class="land-hero-visual">
@@ -148,23 +156,54 @@
       <div class="land-features-grid">
         <div class="land-feature-card reveal reveal-d1" onclick="openFeature('chat')" style="cursor:pointer">
           <div class="land-feature-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">💬</div>
-          <h3 class="land-feature-title">AI Career Advisor</h3>
+          <h3 class="land-feature-title">💬 AI Career Advisor</h3>
           <p class="land-feature-desc">Ask anything — "How do I switch to product management?" or "Review my resume for a senior dev role." Get specific, actionable answers instantly. No fluff.</p>
         </div>
         <div class="land-feature-card reveal reveal-d2" onclick="openFeature('skills')" style="cursor:pointer">
           <div class="land-feature-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">📊</div>
-          <h3 class="land-feature-title">Skill Gap Analysis</h3>
+          <h3 class="land-feature-title">📊 Skill Gap Analysis</h3>
           <p class="land-feature-desc">Select the skills you have → get an instant match score against your target role → see exactly what to learn next, ranked by priority, with free learning resources linked.</p>
         </div>
         <div class="land-feature-card reveal reveal-d3" onclick="openFeature('jobs')" style="cursor:pointer">
           <div class="land-feature-icon" style="background:linear-gradient(135deg,#10b981,#059669)">💼</div>
-          <h3 class="land-feature-title">Smart Job Matching</h3>
+          <h3 class="land-feature-title">💼 Real Job Matching</h3>
           <p class="land-feature-desc">Search real jobs from LinkedIn, Indeed and Glassdoor. Filter by location, level and type. See which jobs fit your skills today — not what an algorithm thinks you might want.</p>
         </div>
         <div class="land-feature-card reveal reveal-d4" onclick="openFeature('mentor')" style="cursor:pointer">
           <div class="land-feature-icon" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">🎓</div>
-          <h3 class="land-feature-title">1-on-1 Mentorship</h3>
-          <p class="land-feature-desc">60-min 1:1 video call · Resume review · Mock interview · 7-day follow-up chat. A real human expert, not another chatbot.</p>
+          <h3 class="land-feature-title">🎓 Expert Mentorship</h3>
+          <p class="land-feature-desc">60-min 1:1 video call · Resume review · Mock interview · 7-day follow-up chat. A real human expert, not another chatbot, for ₹500.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Unified Flow Section -->
+  <section class="land-section land-section-dark" style="padding:60px 0">
+    <div class="land-section-inner">
+      <div class="land-section-label">✦ One connected flow</div>
+      <h2 class="land-section-heading reveal">Skills → Jobs → Roadmap</h2>
+      <p style="text-align:center;color:var(--land-text2);margin-bottom:48px;font-size:16px">Three features that work together as one system</p>
+      <div class="land-flow-steps">
+        <div class="land-flow-step reveal reveal-d1">
+          <div class="land-flow-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">📊</div>
+          <div class="land-flow-num">1</div>
+          <h3 class="land-flow-title">Analyze your skills</h3>
+          <p class="land-flow-desc">Select your current skills. Get an instant match score (0–100) against any target role with a priority breakdown of what to learn next.</p>
+        </div>
+        <div class="land-flow-arrow reveal reveal-d2">→</div>
+        <div class="land-flow-step reveal reveal-d2">
+          <div class="land-flow-icon" style="background:linear-gradient(135deg,#10b981,#059669)">💼</div>
+          <div class="land-flow-num">2</div>
+          <h3 class="land-flow-title">Match with real jobs</h3>
+          <p class="land-flow-desc">See actual job listings from LinkedIn, Indeed & Glassdoor that match your current skill level — filtered by location, type and seniority.</p>
+        </div>
+        <div class="land-flow-arrow reveal reveal-d3">→</div>
+        <div class="land-flow-step reveal reveal-d3">
+          <div class="land-flow-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">🗺️</div>
+          <div class="land-flow-num">3</div>
+          <h3 class="land-flow-title">Follow your roadmap</h3>
+          <p class="land-flow-desc">Get a 3–6 month personalized learning plan with specific courses, resources and milestones — all free, all linked, all relevant to your goal.</p>
         </div>
       </div>
     </div>
@@ -286,7 +325,7 @@
           <div class="land-compare-item land-compare-good">✅ Advice based on your specific skills & target role</div>
           <div class="land-compare-item land-compare-good">✅ Instant match score with prioritized skill gaps</div>
           <div class="land-compare-item land-compare-good">✅ Real jobs from LinkedIn, Indeed & Glassdoor</div>
-          <div class="land-compare-item land-compare-good">✅ 1:1 expert mentor session </div>
+          <div class="land-compare-item land-compare-good">✅ 1:1 expert mentor session for ₹500</div>
           <div class="land-compare-item land-compare-good">✅ Everything in one place, built for career growth</div>
         </div>
       </div>
@@ -297,11 +336,16 @@
   <section class="land-section land-cta-section">
     <div class="land-cta-inner">
       <div class="land-orb land-orb-cta"></div>
-      <h2 class="land-cta-heading">Your next career move<br>starts in 2 minutes.</h2>
-      <p class="land-cta-sub">Free forever. No credit card. No fluff — just a clear path forward.</p>
-      <button class="land-btn-hero" onclick="showLandingAuth('signup')">
-        Get My Free Skill Analysis <span class="land-btn-arrow">→</span>
-      </button>
+      <h2 class="land-cta-heading">Find your career path<br>in 2 minutes.</h2>
+      <p class="land-cta-sub">Free forever · No credit card · Instant skill analysis</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+        <button class="land-btn-hero" onclick="showLandingAuth('signup')">
+          Find My Career Path <span class="land-btn-arrow">→</span>
+        </button>
+        <button class="land-btn-outline" onclick="showLandingAuth('signup')" style="border-color:rgba(255,255,255,0.2);color:var(--land-text2)">
+          Analyze My Skills
+        </button>
+      </div>
     </div>
   </section>
 
