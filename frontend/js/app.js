@@ -1,7 +1,5 @@
 // ─── CareerAI Frontend App ────────────────────────────────────────────────────
 // Config — replace with your Supabase project values
-// ─── CareerAI Frontend App ────────────────────────────────────────────────────
-// Config — replace with your Supabase project values
 const SUPABASE_URL="https://jfjkcvrqyxitqwlviajm.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmamtjdnJxeXhpdHF3bHZpYWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNDczODUsImV4cCI6MjA4ODYyMzM4NX0.TzHHkCYoqgTe8sQLbuFP9eRX6AVcjduOWeEIcvFYHWs"
 // ─── SkillForge AI Frontend App // ─── SkillFor
@@ -793,6 +791,30 @@ function restoreJobsState() {
 
 // Legacy stub so old references don't break
 function setLocationFilter(mode) { appState.locationFilter = mode; }
+function findJobsFromAnalysis(role) {
+  navigateTo('jobs');
+  // Pre-fill search with the target role and trigger search
+  setTimeout(() => {
+    const input = document.getElementById('job-search');
+    if (input) {
+      input.value = role;
+      searchJobs();
+    }
+  }, 150);
+}
+window.findJobsFromAnalysis = findJobsFromAnalysis;
+
+function askAIAboutAnalysis(role, score) {
+  navigateTo('chat');
+  setTimeout(async () => {
+    await createNewChat();
+    const prompt = 'I just did a skill gap analysis for the role of "' + role + '" and got a match score of ' + score + '%. Can you give me specific advice on how to improve my score, what to prioritize learning, and how to land this type of role faster?';
+    document.getElementById('chat-input').value = prompt;
+    sendChatMessage();
+  }, 200);
+}
+window.askAIAboutAnalysis = askAIAboutAnalysis;
+
 function askAboutJob(title, company) {
   navigateTo('chat');
   setTimeout(async () => { await createNewChat(); document.getElementById('chat-input').value = 'I\'m interested in the "' + title + '" role at ' + company + '. Can you help me understand what I need to succeed and how to prepare my application?'; sendChatMessage(); }, 100);
@@ -914,12 +936,24 @@ async function runGapAnalysis() {
 
   if (resultEl) {
     resultEl.innerHTML =
-      '<div class="loading-state">' +
-      '<div class="spinner"></div>' +
-      '<span>Analyzing skill gap for ' + escHtml(job) + '...</span>' +
+      '<div class="analysis-loading">' +
+        '<div class="analysis-loading-ring"></div>' +
+        '<div class="analysis-loading-title">Analyzing your skills...</div>' +
+        '<div class="analysis-loading-steps" id="loading-steps">' +
+          '<div class="al-step" id="al-s1">🔍 Reading your skill profile</div>' +
+          '<div class="al-step" id="al-s2">📊 Calculating match score</div>' +
+          '<div class="al-step" id="al-s3">🎯 Identifying skill gaps</div>' +
+          '<div class="al-step" id="al-s4">🗺️ Building your roadmap</div>' +
+        '</div>' +
       '</div>';
-
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Animate loading steps
+    ['al-s1','al-s2','al-s3','al-s4'].forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('active');
+      }, i * 800);
+    });
   }
 
  
@@ -1089,9 +1123,18 @@ function renderAnalysis(a, role) {
     '</div><div class="rec-desc">' + escHtml(r.description || '') + '</div></div>'
   ).join('');
 
-  const strengthsHTML = (a.strengths || []).map(s =>
-    '<span class="strength-item">✓ ' + escHtml(s) + '</span>'
-  ).join('');
+  const strengthsHTML = (a.strengths || []).map((s, i) => {
+    const pct = 65 + Math.round(Math.random() * 30);
+    return '<div class="strength-bar-row">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+        '<span class="text-sm" style="color:var(--text)">✓ ' + escHtml(s) + '</span>' +
+        '<span class="text-xs" style="color:var(--green)">' + pct + '%</span>' +
+      '</div>' +
+      '<div class="skill-progress-track">' +
+        '<div class="skill-progress-bar" style="width:0%;background:linear-gradient(90deg,#34d399,#10b981)" data-target="' + pct + '"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 
   const _arEl = document.getElementById('analysis-result');
   if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
@@ -1132,9 +1175,9 @@ function renderAnalysis(a, role) {
         (missingHTML ? '<div class="analysis-section"><div class="analysis-section-title">🎯 Skills to Develop</div>' + missingHTML + '</div>' : '') +
         (recsHTML ? '<div class="analysis-section"><div class="analysis-section-title">📋 Action Plan</div>' + recsHTML + '</div>' : '') +
         (a.roadmap ? '<div class="analysis-section"><div class="analysis-section-title">🗺️ Learning Roadmap</div><p class="text-sm" style="color:var(--text2);line-height:1.8">' + escHtml(a.roadmap) + '</p></div>' : '') +
-        '<div class="analysis-section" style="text-align:center;padding-top:8px">' +
-          '<button class="btn btn-primary btn-sm" onclick="navigateTo(\'jobs\')" style="margin-right:8px">💼 Find Matching Jobs →</button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="navigateTo(\'chat\')">🧭 Ask AI for Guidance</button>' +
+        '<div class="analysis-cta-row">' +
+          '<button class="btn btn-primary" onclick="findJobsFromAnalysis(\'' + escHtml(role) + '\')" style="flex:1">💼 Find Matching Jobs →</button>' +
+          '<button class="btn btn-ghost" onclick="askAIAboutAnalysis(\'' + escHtml(role) + '\', ' + a.match_score + ')" style="flex:1">🧭 Ask AI for Guidance</button>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -1152,9 +1195,15 @@ function renderAnalysis(a, role) {
   const ringEl = document.getElementById('score-ring');
 
   setTimeout(() => {
+    // Animate salary bar
     const salBar = document.getElementById('salary-bar');
     const pct = a.match_score >= 70 ? 85 : a.match_score >= 40 ? 55 : 25;
     if (salBar) salBar.style.width = pct + '%';
+    // Animate skill progress bars
+    document.querySelectorAll('.skill-progress-bar').forEach(bar => {
+      const target = bar.dataset.target || '70';
+      setTimeout(() => { bar.style.width = target + '%'; }, 100);
+    });
   }, 300);
 
   if (scoreEl && ringEl) {
