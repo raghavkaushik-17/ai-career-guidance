@@ -1099,214 +1099,178 @@ function rerunAnalysis(role) {
 
 
 function renderAnalysis(a, role) {
-  const sc = a.match_score >= 70 ? 'var(--green)' : a.match_score >= 40 ? 'var(--amber)' : 'var(--red)';
+  const score = a.match_score || 0;
+  const sc = score >= 70 ? '#34d399' : score >= 40 ? '#fbbf24' : '#f87171';
+  const scVar = score >= 70 ? 'var(--green)' : score >= 40 ? 'var(--amber)' : 'var(--red)';
+  const label = score >= 70 ? 'Strong Match' : score >= 40 ? 'Partial Match' : 'Needs Work';
 
+  // ── Score circle SVG ──
+  const circ = 2 * Math.PI * 52;
+  const offset = circ - (score / 100) * circ;
+  const scoreCircle = `
+    <div class="ar-score-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="52" fill="none" stroke="var(--bg3)" stroke-width="10"/>
+        <circle cx="65" cy="65" r="52" fill="none" stroke="${sc}" stroke-width="10"
+          stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"
+          transform="rotate(-90 65 65)" id="score-circle">
+          <animate attributeName="stroke-dashoffset" from="${circ}" to="${offset}"
+            dur="1.2s" calcMode="spline" keySplines="0.16 1 0.3 1" fill="freeze"/>
+        </circle>
+      </svg>
+      <div class="ar-score-inner">
+        <div class="ar-score-num" id="ar-score-num" style="color:${sc}">0</div>
+        <div class="ar-score-pct" style="color:${sc}">%</div>
+        <div class="ar-score-label">${escHtml(label)}</div>
+      </div>
+    </div>`;
+
+  // ── Missing skills with colored priority tags + progress bars ──
+  const priorityConfig = {
+    critical:     { color: '#f87171', bg: 'rgba(248,113,113,0.12)', label: '🔴 Critical' },
+    important:    { color: '#fbbf24', bg: 'rgba(251,191,36,0.12)',  label: '🟡 Important' },
+    nice_to_have: { color: '#34d399', bg: 'rgba(52,211,153,0.12)', label: '🟢 Nice to have' }
+  };
   const missingHTML = (a.missing_skills || []).map(s => {
-    const priority = (s.priority || '').replace('_', ' ');
-    return '<div class="missing-skill-item">' +
-      '<div class="missing-skill-name">' + escHtml(s.skill) +
-      (priority ? '<span class="priority-badge priority-' + s.priority + '">' + priority + '</span>' : '') +
-      '</div>' +
-      '<div class="missing-skill-reason">' + escHtml(s.reason || '') + '</div>' +
-      '<div class="missing-skill-resources">' + (s.resources || []).map(r => {
+    const p = priorityConfig[s.priority] || priorityConfig.important;
+    const gapPct = s.priority === 'critical' ? Math.floor(Math.random()*20+5) : s.priority === 'important' ? Math.floor(Math.random()*30+20) : Math.floor(Math.random()*30+40);
+    const resources = (s.resources || []).map(r => {
       const url = resourceToUrl(r);
       return url
-        ? '<a class="resource-link" href="' + url + '" target="_blank" rel="noopener">' + escHtml(r) + ' ↗</a>'
-        : '<span class="resource-link">' + escHtml(r) + '</span>';
-    }).join('') + '</div>' +
-      '</div>';
+        ? '<a class="ar-resource" href="'+url+'" target="_blank" rel="noopener">'+escHtml(r)+' ↗</a>'
+        : '<span class="ar-resource">'+escHtml(r)+'</span>';
+    }).join('');
+    return `<div class="ar-skill-card">
+      <div class="ar-skill-header">
+        <span class="ar-skill-name">${escHtml(s.skill || '')}</span>
+        <span class="ar-priority-tag" style="color:${p.color};background:${p.bg}">${p.label}</span>
+      </div>
+      <div class="ar-skill-bar-row">
+        <div class="ar-skill-track"><div class="ar-skill-fill" style="background:${p.color}" data-target="${gapPct}"></div></div>
+        <span class="ar-skill-pct" style="color:${p.color}">${gapPct}%</span>
+      </div>
+      ${s.reason ? '<div class="ar-skill-reason">'+escHtml(s.reason)+'</div>' : ''}
+      ${resources ? '<div class="ar-resources-row">'+resources+'</div>' : ''}
+    </div>`;
   }).join('');
 
+  // ── Strengths with bars ──
+  const strengthsHTML = (a.strengths || []).map(s => {
+    const pct = Math.floor(Math.random()*25+70);
+    return `<div class="ar-strength-row">
+      <div class="ar-strength-label"><span style="color:var(--green)">✓</span> ${escHtml(s)}</div>
+      <div class="ar-strength-right">
+        <div class="ar-skill-track" style="width:120px"><div class="ar-skill-fill" style="background:var(--green)" data-target="${pct}"></div></div>
+        <span class="ar-skill-pct" style="color:var(--green);min-width:32px">${pct}%</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Roadmap timeline ──
+  const roadmapText = a.roadmap || '';
+  const months = roadmapText.split(/Month \d+:/i).filter(Boolean);
+  const timelineHTML = months.length > 1
+    ? '<div class="ar-timeline">' + months.map((m, i) => `
+        <div class="ar-timeline-item">
+          <div class="ar-timeline-dot" style="background:${i===0?'#7c6fff':i===1?'#60a5fa':'#34d399'}"></div>
+          <div class="ar-timeline-content">
+            <div class="ar-timeline-month">Month ${i+1}</div>
+            <div class="ar-timeline-text">${escHtml(m.trim())}</div>
+          </div>
+        </div>`).join('') + '</div>'
+    : '<p class="text-sm" style="color:var(--text2);line-height:1.8">' + escHtml(roadmapText) + '</p>';
+
+  // ── Recommendations ──
   const recsHTML = (a.recommendations || []).map(r =>
-    '<div class="rec-item"><div class="rec-title">' + escHtml(r.title) +
-    (r.timeframe ? '<span class="rec-timeframe">⏱ ' + escHtml(r.timeframe) + '</span>' : '') +
-    '</div><div class="rec-desc">' + escHtml(r.description || '') + '</div></div>'
+    `<div class="ar-rec">
+      <div class="ar-rec-header">
+        <span class="ar-rec-title">${escHtml(r.title||'')}</span>
+        ${r.timeframe ? '<span class="ar-rec-time">⏱ '+escHtml(r.timeframe)+'</span>' : ''}
+      </div>
+      <div class="ar-rec-desc">${escHtml(r.description||'')}</div>
+    </div>`
   ).join('');
-
-  const strengthsHTML = (a.strengths || []).map((s, i) => {
-    const pct = 65 + Math.round(Math.random() * 30);
-    return '<div class="strength-bar-row">' +
-      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
-        '<span class="text-sm" style="color:var(--text)">✓ ' + escHtml(s) + '</span>' +
-        '<span class="text-xs" style="color:var(--green)">' + pct + '%</span>' +
-      '</div>' +
-      '<div class="skill-progress-track">' +
-        '<div class="skill-progress-bar" style="width:0%;background:linear-gradient(90deg,#34d399,#10b981)" data-target="' + pct + '"></div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
 
   const _arEl = document.getElementById('analysis-result');
   if (_arEl && a.id) _arEl.dataset.analysisId = a.id;
 
-  // Build radar chart data from strengths + missing skills
-  const radarSkills = [
-    ...(a.strengths || []).slice(0, 3).map(s => ({ label: s.substring(0, 18), value: 80 + Math.random() * 20 })),
-    ...(a.missing_skills || []).slice(0, 3).map(s => ({ label: s.skill?.substring(0, 18) || '', value: 10 + Math.random() * 30 }))
-  ].slice(0, 6);
-  const radarHTML = buildRadarChart(radarSkills, sc);
+  _arEl.innerHTML = `
+    <div class="ar-card">
+      <div class="ar-topbar">
+        <div class="ar-topbar-left">
+          <span class="ar-role-chip">📊 ${escHtml(role)}</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="resetSkillGap()" style="color:var(--text3);font-size:12px">↺ New Analysis</button>
+      </div>
 
-  // Salary insight (estimated based on role)
-  const salaryHTML = buildSalaryInsight(role, a.match_score);
+      <div class="ar-header">
+        ${scoreCircle}
+        <div class="ar-header-text">
+          <h2 class="ar-title">Skill Gap Analysis</h2>
+          <p class="ar-summary">${escHtml(a.summary||'')}</p>
+          <div class="ar-quick-stats">
+            <div class="ar-stat"><span style="color:var(--green);font-weight:700">${(a.strengths||[]).length}</span><span>Strengths</span></div>
+            <div class="ar-stat"><span style="color:var(--red);font-weight:700">${(a.missing_skills||[]).filter(s=>s.priority==='critical').length}</span><span>Critical gaps</span></div>
+            <div class="ar-stat"><span style="color:var(--accent2);font-weight:700">${(a.recommendations||[]).length}</span><span>Actions</span></div>
+          </div>
+        </div>
+      </div>
 
-  _arEl.innerHTML =
-    '<div class="analysis-result">' +
-      '<div style="display:flex;justify-content:flex-end;margin-bottom:12px">' +
-        '<button class="btn btn-ghost btn-sm" onclick="resetSkillGap()" style="color:var(--text3)">↺ New Analysis</button>' +
-      '</div>' +
-      '<div class="analysis-header">' +
-        '<div class="score-ring-wrap">' +
-          '<div class="score-ring" id="score-ring" style="background:conic-gradient(' + sc + ' 0deg,var(--bg3) 0deg)">' +
-            '<span id="match-score" class="score-value" style="color:' + sc + '">0%</span>' +
-          '</div>' +
-          '<span class="text-xs text-muted">Match score</span>' +
-        '</div>' +
-        '<div style="flex:1">' +
-          '<h3 style="font-family:var(--font-display);font-size:18px;margin-bottom:8px">Analysis: ' + escHtml(role) + '</h3>' +
-          '<p class="text-sm" style="color:var(--text2);line-height:1.7">' + escHtml(a.summary || '') + '</p>' +
-        '</div>' +
-      '</div>' +
-      '<div class="analysis-body">' +
-        '<div class="analysis-charts-row">' +
-          radarHTML +
-          salaryHTML +
-        '</div>' +
-        (strengthsHTML ? '<div class="analysis-section"><div class="analysis-section-title">✅ Your Strengths</div><div class="strength-list">' + strengthsHTML + '</div></div>' : '') +
-        (missingHTML ? '<div class="analysis-section"><div class="analysis-section-title">🎯 Skills to Develop</div>' + missingHTML + '</div>' : '') +
-        (recsHTML ? '<div class="analysis-section"><div class="analysis-section-title">📋 Action Plan</div>' + recsHTML + '</div>' : '') +
-        (a.roadmap ? '<div class="analysis-section"><div class="analysis-section-title">🗺️ Learning Roadmap</div><p class="text-sm" style="color:var(--text2);line-height:1.8">' + escHtml(a.roadmap) + '</p></div>' : '') +
-        '<div class="analysis-cta-row">' +
-          '<button class="btn btn-primary" onclick="findJobsFromAnalysis(\'' + escHtml(role) + '\')" style="flex:1">💼 Find Matching Jobs →</button>' +
-          '<button class="btn btn-ghost" onclick="askAIAboutAnalysis(\'' + escHtml(role) + '\', ' + a.match_score + ')" style="flex:1">🧭 Ask AI for Guidance</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+      ${strengthsHTML ? `<div class="ar-section">
+        <div class="ar-section-title">✅ Your Strengths</div>
+        <div class="ar-strengths-list">${strengthsHTML}</div>
+      </div>` : ''}
 
-  // scroll
+      ${missingHTML ? `<div class="ar-section">
+        <div class="ar-section-title">🎯 Skills to Develop</div>
+        ${missingHTML}
+      </div>` : ''}
+
+      ${recsHTML ? `<div class="ar-section">
+        <div class="ar-section-title">📋 Action Plan</div>
+        ${recsHTML}
+      </div>` : ''}
+
+      ${roadmapText ? `<div class="ar-section">
+        <div class="ar-section-title">🗺️ Learning Roadmap</div>
+        ${timelineHTML}
+      </div>` : ''}
+
+      <div class="ar-cta-row">
+        <button class="btn btn-primary ar-cta-btn" onclick="findJobsFromAnalysis('${escHtml(role).replace(/'/g,"\'")}')">💼 Find Matching Jobs →</button>
+        <button class="btn btn-ghost ar-cta-btn" onclick="askAIAboutAnalysis('${escHtml(role).replace(/'/g,"\'")}', ${score})">🧭 Ask AI for Guidance</button>
+      </div>
+    </div>`;
+
+  // Animate score counter
+  let n = 0;
+  const counter = setInterval(() => {
+    n = Math.min(n + Math.ceil(score / 40), score);
+    const el = document.getElementById('ar-score-num');
+    if (el) el.textContent = n;
+    if (n >= score) clearInterval(counter);
+  }, 25);
+
+  // Animate bars
   setTimeout(() => {
-    _arEl.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
+    document.querySelectorAll('.ar-skill-fill').forEach(bar => {
+      const t = bar.dataset.target || '60';
+      bar.style.width = t + '%';
     });
-  }, 50);
+  }, 400);
 
-  // animate
-  const scoreEl = document.getElementById('match-score');
-  const ringEl = document.getElementById('score-ring');
-
+  // Animate salary bar if present
   setTimeout(() => {
-    // Animate salary bar
     const salBar = document.getElementById('salary-bar');
-    const pct = a.match_score >= 70 ? 85 : a.match_score >= 40 ? 55 : 25;
+    const pct = score >= 70 ? 85 : score >= 40 ? 55 : 25;
     if (salBar) salBar.style.width = pct + '%';
-    // Animate skill progress bars
-    document.querySelectorAll('.skill-progress-bar').forEach(bar => {
-      const target = bar.dataset.target || '70';
-      setTimeout(() => { bar.style.width = target + '%'; }, 100);
-    });
-  }, 300);
+  }, 400);
 
-  if (scoreEl && ringEl) {
-    setTimeout(() => {
-      animateScore(scoreEl, a.match_score);
-
-      let current = 0;
-      const target = a.match_score;
-
-      const ringInterval = setInterval(() => {
-        current++;
-        const d = Math.round((current / 100) * 360);
-
-        ringEl.style.background =
-          'conic-gradient(' + sc + ' ' + d + 'deg,var(--bg3) 0deg)';
-
-        if (current >= target) clearInterval(ringInterval);
-      }, 10);
-
-    }, 400);
-  }
+  setTimeout(() => {
+    _arEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
-// ─── Profile ──────────────────────────────────────────────────────────────────
-async function loadProfile() {
-  try { appState.profile = await api.getProfile(); } catch { return; }
-  const p = appState.profile;
-  document.getElementById('p-name').value = p.full_name || '';
-  document.getElementById('p-location').value = p.location || '';
-  document.getElementById('p-current-role').value = p.current_position || '';
-  document.getElementById('p-target-role').value = p.target_position || '';
-  document.getElementById('p-experience').value = p.experience_years || '';
-  document.getElementById('p-education').value = p.education_level || '';
-  document.getElementById('p-bio').value = p.bio || '';
-  document.getElementById('p-linkedin').value = p.linkedin_url || '';
-  document.getElementById('p-github').value = p.github_url || '';
-  const initials = (p.full_name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  document.getElementById('profile-avatar-big').textContent = initials;
-  document.getElementById('profile-display-name').textContent = p.full_name || '—';
-  document.getElementById('profile-display-role').textContent = p.current_position || 'No role set';
-  loadProfileTransactions();
-}
-
-async function saveProfile() {
-  const btn = document.getElementById('save-profile-btn');
-  btn.disabled = true; btn.textContent = 'Saving...';
-  try {
-    appState.profile = await api.updateProfile({
-      full_name: document.getElementById('p-name').value,
-      location: document.getElementById('p-location').value,
-      current_position: document.getElementById('p-current-role').value,
-      target_position: document.getElementById('p-target-role').value,
-      experience_years: parseInt(document.getElementById('p-experience').value) || 0,
-      education_level: document.getElementById('p-education').value,
-      bio: document.getElementById('p-bio').value,
-      linkedin_url: document.getElementById('p-linkedin').value,
-      github_url: document.getElementById('p-github').value
-    });
-    updateSidebar(); loadProfile(); toast('Profile saved!', 'success');
-  } catch { toast('Could not save profile', 'error'); }
-  finally { btn.disabled = false; btn.textContent = 'Save Profile'; }
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function toast(message, type='info') {
-  const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = message;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => el.remove(), 3500);
-}
-function escHtml(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ─── Expose functions globally for inline onclick handlers ────────────────────
-window.navigateTo = navigateTo;
-window.signOut = signOut;
-window.createNewChat = createNewChat;
-window.sendPrompt = sendPrompt;
-window.sendChatMessage = sendChatMessage;
-window.searchJobs = searchJobs;
-window.switchJobTab = switchJobTab;
-window.filterJobs = filterJobs;
-window.setLocationFilter = setLocationFilter;
-window.handleLocationDropdown = handleLocationDropdown;
-window.applyCustomLocation = applyCustomLocation;
-window.locationAutocomplete = locationAutocomplete;
-window.selectLocation = selectLocation;
-window.resetJobSearch = resetJobSearch;
-window.saveJob = saveJob;
-window.unsaveJob = unsaveJob;
-window.askAboutJob = askAboutJob;
-window.openSession = openSession;
-window.deleteSession = deleteSession;
-window.addSkill = addSkill;
-window.removeSkill = removeSkill;
-window.loadSkillsForJob = loadSkillsForJob;
-window.runGapAnalysis = runGapAnalysis;
-window.toggleSkillItem = toggleSkillItem;
-window.updateStates = updateStates;
-window.saveProfile = saveProfile;
-window.rerunAnalysis = rerunAnalysis;
 window.renderAnalysis = renderAnalysis;
 
 function buildRadarChart(skills, color) {
@@ -2058,4 +2022,5 @@ window.mobileNav = mobileNav;
     chatInput.addEventListener('focus', () => chatInput.style.caretColor = '#7c6fff');
   }
 
+  
 })();
