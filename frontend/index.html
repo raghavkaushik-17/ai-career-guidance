@@ -62,14 +62,14 @@
       <div class="land-grid"></div>
     </div>
     <div class="land-hero-content">
-      <div class="land-badge">✦ AI Career Companion · Free to start</div>
+      <div class="land-badge">✦ Free · No credit card · 2 min setup</div>
       <h1 class="land-heading">
-        Know exactly what<br>
-        <span class="land-heading-accent">your career needs.</span>
+        The AI that tells you<br>
+        <span class="land-heading-accent">exactly what's next.</span>
       </h1>
       <p class="land-subheading">
-        SkillForge AI analyzes your skills, identifies your gaps, suggests real jobs<br class="land-br">
-        and builds your personalized learning roadmap — in under 2 minutes.
+        Get your skill gap score, see real job matches, and get a step-by-step learning roadmap<br class="land-br">
+        — personalized to your exact profile in under 2 minutes.
       </p>
       <!-- Inline value props -->
       <div class="land-value-props">
@@ -120,29 +120,52 @@
           <div class="land-card-float-val" style="color:var(--land-amber)">Booked ✓</div>
         </div>
       </div>
-      <div class="land-mockup">
+      <div class="land-dashboard-preview">
         <div class="land-mockup-bar">
           <span class="land-dot" style="background:#ff5f57"></span>
           <span class="land-dot" style="background:#febc2e"></span>
           <span class="land-dot" style="background:#28c840"></span>
-          <span style="flex:1;text-align:center;font-size:11px;color:#888">SkillForge AI Dashboard</span>
+          <span style="flex:1;text-align:center;font-size:11px;color:#666">skillforge-ai.vercel.app</span>
         </div>
-        <div class="land-mockup-body">
-          <div class="land-mockup-msg land-mockup-msg-ai">
-            <span class="land-mockup-av">🧭</span>
-            <div class="land-mockup-bubble">Hi! I analyzed your profile. You're <strong>78% ready</strong> for a Senior Developer role. Want to see your roadmap?</div>
+        <!-- Score + summary row -->
+        <div class="ldp-header">
+          <div class="ldp-score-ring">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1a1a24" stroke-width="7"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#34d399" stroke-width="7"
+                stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="50"
+                transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="ldp-score-inner"><span style="color:#34d399;font-weight:800;font-size:18px">78%</span><span style="font-size:9px;color:#5a5a72">Match</span></div>
           </div>
-          <div class="land-mockup-msg land-mockup-msg-user">
-            <div class="land-mockup-bubble land-mockup-bubble-user">Yes, show me what I need to learn!</div>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#f0f0f8">Senior Developer</div>
+            <div style="font-size:11px;color:#34d399;margin-top:2px">✓ Strong Match</div>
+            <div style="font-size:11px;color:#9090a8;margin-top:4px">3 critical gaps to close</div>
           </div>
-          <div class="land-mockup-msg land-mockup-msg-ai">
-            <span class="land-mockup-av">🧭</span>
-            <div class="land-mockup-bubble">
-              <div class="land-mockup-typing">
-                <span></span><span></span><span></span>
-              </div>
-            </div>
+        </div>
+        <!-- Skill bars -->
+        <div class="ldp-skills">
+          <div class="ldp-skill-row"><span>React</span><div class="ldp-bar"><div style="width:90%;background:#34d399"></div></div><span style="color:#34d399">90%</span></div>
+          <div class="ldp-skill-row"><span>System Design</span><div class="ldp-bar"><div style="width:35%;background:#f87171"></div></div><span style="color:#f87171">35%</span></div>
+          <div class="ldp-skill-row"><span>TypeScript</span><div class="ldp-bar"><div style="width:65%;background:#fbbf24"></div></div><span style="color:#fbbf24">65%</span></div>
+          <div class="ldp-skill-row"><span>AWS</span><div class="ldp-bar"><div style="width:20%;background:#f87171"></div></div><span style="color:#f87171">20%</span></div>
+        </div>
+        <!-- Job match row -->
+        <div class="ldp-job">
+          <span style="font-size:14px">💼</span>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:600;color:#f0f0f8">Senior Frontend Engineer</div>
+            <div style="font-size:10px;color:#9090a8">Flipkart · Bangalore · ₹28–40 LPA</div>
           </div>
+          <span class="ldp-match-badge">78%</span>
+        </div>
+        <!-- Roadmap peek -->
+        <div class="ldp-roadmap">
+          <div style="font-size:10px;font-weight:700;color:#9090a8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">🗺️ Your Roadmap</div>
+          <div class="ldp-road-item"><div class="ldp-road-dot" style="background:#7c6fff"></div><span>Month 1: System Design fundamentals (Grokking course)</span></div>
+          <div class="ldp-road-item"><div class="ldp-road-dot" style="background:#60a5fa"></div><span>Month 2: AWS Certified Developer — free tier practice</span></div>
+          <div class="ldp-road-item"><div class="ldp-road-dot" style="background:#34d399"></div><span>Month 3: Build portfolio project + apply to 10 roles</span></div>
         </div>
       </div>
     </div>

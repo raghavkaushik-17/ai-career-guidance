@@ -440,34 +440,37 @@ async function sendChatMessage() {
 async function typeMessage(fullContent) {
   const el = document.getElementById('chat-messages');
 
-  // Create the message bubble first (empty)
+  // Create message bubble
   const msgDiv = document.createElement('div');
   msgDiv.className = 'message assistant';
   msgDiv.innerHTML =
     '<div class="message-avatar">🧭</div>' +
     '<div class="message-content"><div class="message-bubble" id="typing-bubble"></div></div>';
   el.appendChild(msgDiv);
-  scrollToBottom();
+
+  // Scroll ONCE when message appears — then stay put so user can read
+  const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  if (wasAtBottom) scrollToBottom();
 
   const bubble = document.getElementById('typing-bubble');
-
-  // Split into words and render progressively
   const words = fullContent.split(' ');
   let rendered = '';
-  const batchSize = 3; // render 3 words at a time for speed
+  const batchSize = 4;
 
   for (let i = 0; i < words.length; i += batchSize) {
     const batch = words.slice(i, i + batchSize).join(' ');
     rendered += (rendered ? ' ' : '') + batch;
     bubble.innerHTML = marked.parse(rendered);
-    scrollToBottom();
-    await new Promise(r => setTimeout(r, 18)); // ~18ms per batch = fast but visible
+    // Only auto-scroll if user is already near bottom
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    if (nearBottom) el.scrollTop = el.scrollHeight;
+    await new Promise(r => setTimeout(r, 16));
   }
 
-  // Final render to make sure markdown is perfect
   bubble.innerHTML = marked.parse(fullContent);
   bubble.removeAttribute('id');
-  scrollToBottom();
+  // Final scroll only if near bottom
+  if (el.scrollHeight - el.scrollTop - el.clientHeight < 120) scrollToBottom();
 }
 
 function sendPrompt(text) { createNewChat().then(() => { document.getElementById('chat-input').value = text; sendChatMessage(); }); }

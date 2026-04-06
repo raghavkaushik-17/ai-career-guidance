@@ -424,22 +424,26 @@
               box-shadow 0.4s ease !important;
 }
 .land-feature-card::before {
-  content: '';
+  content: "";
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: inherit;
-
+  padding: 1px;
   background: linear-gradient(135deg, #7c5cfc, #60a5fa, #34d399, #7c5cfc);
   background-size: 300% 300%;
-
   opacity: 0;
-  transition: opacity .4s ease;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  box-sizing: border-box;
 
-  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
 
   animation: borderRotate 3s linear infinite paused;
 }
-
 .land-feature-card:hover::before {
   opacity: 1;
   animation-play-state: running;
@@ -562,4 +566,77 @@
 .sidebar.collapsed .nav-label {
   opacity: 0;
   transform: translateX(-10px);
+}
+
+/* ══ MOBILE PERFORMANCE — disable expensive animations on small screens ══ */
+@media (max-width: 768px) {
+  /* Kill heavy background effects */
+  .land-hero-bg::before,
+  .land-hero-bg::after { animation: none; }
+  .land-orb { animation: none !important; filter: blur(60px); }
+  .land-grid { animation: none; }
+  .land-cta-section::before { animation: none; }
+
+  /* Simplify mockup — no 3D transform */
+  .land-mockup,
+  .land-dashboard-preview { transform: none !important; }
+  .land-dashboard-preview { transform: none !important; }
+
+  /* Simpler scroll reveals */
+  .reveal.visible,
+  .reveal-left.visible,
+  .reveal-right.visible,
+  .reveal-scale.visible {
+    animation: simpleFade 0.5s ease both !important;
+  }
+  @keyframes simpleFade {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Disable floating icon animation */
+  .land-feature-icon { animation: none !important; }
+  .land-av { animation: none !important; }
+
+  /* Simpler heading animation */
+  .land-heading { animation: simpleFade 0.6s ease both; }
+  .land-subheading { animation: simpleFade 0.6s ease 0.15s both; }
+
+  /* Remove parallax effects */
+  .land-hero-visual { transform: none !important; transition: none !important; }
+
+  /* Make hero stack vertically */
+  .land-hero { flex-direction: column; padding: 90px 20px 48px; gap: 36px; }
+  .land-hero-visual { width: 100%; max-width: 400px; }
+  .land-hero-content { text-align: center; }
+  .land-value-props { justify-content: center; }
+  .land-stats-row { justify-content: center; }
+  .land-cta-row { justify-content: center; }
+
+  /* Smaller heading on mobile */
+  .land-heading { font-size: clamp(28px, 8vw, 44px) !important; }
+  .land-subheading { font-size: 14px; }
+
+  /* Disable border animation on feature cards */
+  .land-feature-card::before { display: none; }
+  .land-feature-card:hover { transform: translateY(-4px) !important; }
+
+  /* Testimonials single column */
+  .land-testimonials { grid-template-columns: 1fr; }
+  .land-compare-grid { grid-template-columns: 1fr; }
+  .land-flow-steps { flex-direction: column; align-items: stretch; }
+  .land-flow-arrow { transform: rotate(90deg); text-align: center; }
+  .land-flow-step { max-width: 100%; }
+
+  /* CTA buttons full width on mobile */
+  .land-cta-row { flex-direction: column; align-items: stretch; }
+  .land-btn-hero, .land-btn-outline { text-align: center; justify-content: center; }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
