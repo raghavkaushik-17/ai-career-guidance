@@ -12,9 +12,31 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let appState = {
   user: null, profile: null, currentSession: null,
   sessions: [], allJobs: [], matchedJobs: [],
-  mySkills: [], allSkills: [], currentJobTab: 'matches',
+  mySkills: [], allSkills: [], currentJobTab: 'all',
   locationFilter: 'global', jobsMap: {}, isTyping: false
 };
+// ─── UTILITY FUNCTIONS ───────────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function toast(msg, type = 'info', duration = 3500) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const t = document.createElement('div');
+  t.className = 'toast toast-' + type;
+  t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; setTimeout(() => t.remove(), 300); }, duration);
+}
+
+
 
 // ─── Country Data ─────────────────────────────────────────────────────────────
 const COUNTRIES = [
@@ -2022,5 +2044,4 @@ window.mobileNav = mobileNav;
     chatInput.addEventListener('focus', () => chatInput.style.caretColor = '#7c6fff');
   }
 
-  
 })();
