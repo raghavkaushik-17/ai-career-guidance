@@ -99,75 +99,62 @@
       </div>
     </div>
     <div class="land-hero-visual">
+      <!-- Floating stat cards -->
       <div class="land-card-float land-card-float1">
-        <span style="font-size:20px">🎯</span>
-        <div>
-          <div class="land-card-float-title">Skill Match</div>
-          <div class="land-card-float-val" style="color:var(--land-green)">87% Ready</div>
-        </div>
+        <span style="font-size:18px">🎯</span>
+        <div><div class="land-card-float-title">Skill Match</div><div class="land-card-float-val" style="color:#34d399">78% Ready</div></div>
       </div>
       <div class="land-card-float land-card-float2">
-        <span style="font-size:20px">💼</span>
-        <div>
-          <div class="land-card-float-title">Jobs Found</div>
-          <div class="land-card-float-val">24 Matches</div>
+        <span style="font-size:18px">💼</span>
+        <div><div class="land-card-float-title">Jobs Found</div><div class="land-card-float-val">24 Matches</div></div>
+      </div>
+
+      <!-- Dashboard preview card -->
+      <div class="land-preview-card">
+        <div class="lpc-topbar">
+          <div class="lpc-dots"><span></span><span></span><span></span></div>
+          <span class="lpc-url">SkillForge AI · Dashboard</span>
+        </div>
+        <div class="lpc-body">
+          <!-- Score -->
+          <div class="lpc-score-row">
+            <div class="lpc-ring-wrap">
+              <svg width="72" height="72" viewBox="0 0 72 72">
+                <circle cx="36" cy="36" r="28" fill="none" stroke="#1a1a24" stroke-width="6"/>
+                <circle cx="36" cy="36" r="28" fill="none" stroke="#34d399" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="176" stroke-dashoffset="44"
+                  transform="rotate(-90 36 36)"/>
+              </svg>
+              <div class="lpc-ring-label"><span style="color:#34d399;font-weight:800;font-size:16px">78%</span></div>
+            </div>
+            <div>
+              <div class="lpc-role">Senior Developer</div>
+              <div class="lpc-match">✓ Strong Match</div>
+              <div class="lpc-gaps">3 gaps to close</div>
+            </div>
+          </div>
+          <!-- Skill bars -->
+          <div class="lpc-bars">
+            <div class="lpc-bar-row"><span>React</span><div class="lpc-track"><div class="lpc-fill" style="width:90%;background:#34d399"></div></div><b style="color:#34d399">90%</b></div>
+            <div class="lpc-bar-row"><span>System Design</span><div class="lpc-track"><div class="lpc-fill" style="width:35%;background:#f87171"></div></div><b style="color:#f87171">35%</b></div>
+            <div class="lpc-bar-row"><span>TypeScript</span><div class="lpc-track"><div class="lpc-fill" style="width:65%;background:#fbbf24"></div></div><b style="color:#fbbf24">65%</b></div>
+          </div>
+          <!-- Job match -->
+          <div class="lpc-job">
+            <span>💼</span>
+            <div><div class="lpc-job-title">Senior Frontend Engineer</div><div class="lpc-job-sub">Flipkart · Bangalore · ₹28–40 LPA</div></div>
+            <span class="lpc-badge">78%</span>
+          </div>
+          <!-- Roadmap -->
+          <div class="lpc-roadmap">
+            <div class="lpc-road-label">🗺️ YOUR ROADMAP</div>
+            <div class="lpc-road-item"><div class="lpc-dot" style="background:#7c6fff"></div><span>Month 1: System Design fundamentals</span></div>
+            <div class="lpc-road-item"><div class="lpc-dot" style="background:#60a5fa"></div><span>Month 2: AWS Certified Developer</span></div>
+            <div class="lpc-road-item"><div class="lpc-dot" style="background:#34d399"></div><span>Month 3: Build portfolio + apply</span></div>
+          </div>
         </div>
       </div>
-      <div class="land-card-float land-card-float3">
-        <span style="font-size:20px">🎓</span>
-        <div>
-          <div class="land-card-float-title">Mentor Session</div>
-          <div class="land-card-float-val" style="color:var(--land-amber)">Booked ✓</div>
-        </div>
-      </div>
-      <div class="land-dashboard-preview">
-        <div class="land-mockup-bar">
-          <span class="land-dot" style="background:#ff5f57"></span>
-          <span class="land-dot" style="background:#febc2e"></span>
-          <span class="land-dot" style="background:#28c840"></span>
-          <span style="flex:1;text-align:center;font-size:11px;color:#666">skillforge-ai.vercel.app</span>
-        </div>
-        <!-- Score + summary row -->
-        <div class="ldp-header">
-          <div class="ldp-score-ring">
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="32" fill="none" stroke="#1a1a24" stroke-width="7"/>
-              <circle cx="40" cy="40" r="32" fill="none" stroke="#34d399" stroke-width="7"
-                stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="50"
-                transform="rotate(-90 40 40)"/>
-            </svg>
-            <div class="ldp-score-inner"><span style="color:#34d399;font-weight:800;font-size:18px">78%</span><span style="font-size:9px;color:#5a5a72">Match</span></div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:13px;color:#f0f0f8">Senior Developer</div>
-            <div style="font-size:11px;color:#34d399;margin-top:2px">✓ Strong Match</div>
-            <div style="font-size:11px;color:#9090a8;margin-top:4px">3 critical gaps to close</div>
-          </div>
-        </div>
-        <!-- Skill bars -->
-        <div class="ldp-skills">
-          <div class="ldp-skill-row"><span>React</span><div class="ldp-bar"><div style="width:90%;background:#34d399"></div></div><span style="color:#34d399">90%</span></div>
-          <div class="ldp-skill-row"><span>System Design</span><div class="ldp-bar"><div style="width:35%;background:#f87171"></div></div><span style="color:#f87171">35%</span></div>
-          <div class="ldp-skill-row"><span>TypeScript</span><div class="ldp-bar"><div style="width:65%;background:#fbbf24"></div></div><span style="color:#fbbf24">65%</span></div>
-          <div class="ldp-skill-row"><span>AWS</span><div class="ldp-bar"><div style="width:20%;background:#f87171"></div></div><span style="color:#f87171">20%</span></div>
-        </div>
-        <!-- Job match row -->
-        <div class="ldp-job">
-          <span style="font-size:14px">💼</span>
-          <div style="flex:1">
-            <div style="font-size:11px;font-weight:600;color:#f0f0f8">Senior Frontend Engineer</div>
-            <div style="font-size:10px;color:#9090a8">Flipkart · Bangalore · ₹28–40 LPA</div>
-          </div>
-          <span class="ldp-match-badge">78%</span>
-        </div>
-        <!-- Roadmap peek -->
-        <div class="ldp-roadmap">
-          <div style="font-size:10px;font-weight:700;color:#9090a8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">🗺️ Your Roadmap</div>
-          <div class="ldp-road-item"><div class="ldp-road-dot" style="background:#7c6fff"></div><span>Month 1: System Design fundamentals (Grokking course)</span></div>
-          <div class="ldp-road-item"><div class="ldp-road-dot" style="background:#60a5fa"></div><span>Month 2: AWS Certified Developer — free tier practice</span></div>
-          <div class="ldp-road-item"><div class="ldp-road-dot" style="background:#34d399"></div><span>Month 3: Build portfolio project + apply to 10 roles</span></div>
-        </div>
-      </div>
+    </div>
     </div>
   </section>
 

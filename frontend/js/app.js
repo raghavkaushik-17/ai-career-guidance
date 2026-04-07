@@ -1546,6 +1546,267 @@ window.startMentorPayment = startMentorPayment;
 window.simulateMentorPayment = simulateMentorPayment;
 
 // ─── PROFILE TRANSACTIONS ─────────────────────────────────────────────────────
+async function loadProfile() {
+  try { appState.profile = await api.getProfile(); } catch { return; }
+  const p = appState.profile;
+  document.getElementById('p-name').value = p.full_name || '';
+  document.getElementById('p-location').value = p.location || '';
+  document.getElementById('p-current-role').value = p.current_position || '';
+  document.getElementById('p-target-role').value = p.target_position || '';
+  document.getElementById('p-experience').value = p.experience_years || '';
+  document.getElementById('p-education').value = p.education_level || '';
+  document.getElementById('p-bio').value = p.bio || '';
+  document.getElementById('p-linkedin').value = p.linkedin_url || '';
+  document.getElementById('p-github').value = p.github_url || '';
+  const initials = (p.full_name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('profile-avatar-big').textContent = initials;
+  document.getElementById('profile-display-name').textContent = p.full_name || '—';
+  document.getElementById('profile-display-role').textContent = p.current_position || 'No role set';
+  loadProfileTransactions();
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('save-profile-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    appState.profile = await api.updateProfile({
+      full_name: document.getElementById('p-name').value,
+      location: document.getElementById('p-location').value,
+      current_position: document.getElementById('p-current-role').value,
+      target_position: document.getElementById('p-target-role').value,
+      experience_years: parseInt(document.getElementById('p-experience').value) || 0,
+      education_level: document.getElementById('p-education').value,
+      bio: document.getElementById('p-bio').value,
+      linkedin_url: document.getElementById('p-linkedin').value,
+      github_url: document.getElementById('p-github').value
+    });
+    updateSidebar(); loadProfile(); toast('Profile saved!', 'success');
+  } catch { toast('Could not save profile', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save Profile'; }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function toast(message, type='info') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = message;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Expose functions globally for inline onclick handlers ────────────────────
+window.navigateTo = navigateTo;
+window.signOut = signOut;
+window.createNewChat = createNewChat;
+window.sendPrompt = sendPrompt;
+window.sendChatMessage = sendChatMessage;
+window.searchJobs = searchJobs;
+window.switchJobTab = switchJobTab;
+window.filterJobs = filterJobs;
+window.setLocationFilter = setLocationFilter;
+window.handleLocationDropdown = handleLocationDropdown;
+window.applyCustomLocation = applyCustomLocation;
+window.locationAutocomplete = locationAutocomplete;
+window.selectLocation = selectLocation;
+window.resetJobSearch = resetJobSearch;
+window.saveJob = saveJob;
+window.unsaveJob = unsaveJob;
+window.askAboutJob = askAboutJob;
+window.openSession = openSession;
+window.deleteSession = deleteSession;
+window.addSkill = addSkill;
+window.removeSkill = removeSkill;
+window.loadSkillsForJob = loadSkillsForJob;
+window.runGapAnalysis = runGapAnalysis;
+window.toggleSkillItem = toggleSkillItem;
+window.updateStates = updateStates;
+window.saveProfile = saveProfile;
+window.rerunAnalysis = rerunAnalysis;
+window.renderAnalysis = renderAnalysis;
+
+function resetSkillGap() {
+  // Clear result and form
+  const ar = document.getElementById('analysis-result');
+  if (ar) { ar.innerHTML = ''; ar.removeAttribute('data-analysis-id'); }
+  const jp = document.getElementById('job-profile-input');
+  if (jp) jp.value = '';
+  const s2 = document.getElementById('step2-card');
+  if (s2) s2.style.display = 'none';
+  const container = document.getElementById('job-skills-container');
+  if (container) container.innerHTML = '';
+  // Deselect highlighted past analysis
+  document.querySelectorAll('[id^="past-item-"]').forEach(el => el.style.borderColor = 'transparent');
+  // Scroll to top of skills layout
+  document.querySelector('.skills-layout')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.resetSkillGap = resetSkillGap;
+
+// ─── MENTOR ───────────────────────────────────────────────────────────────────
+function renderMentorSession(session) {
+  const bookedEl = document.getElementById('mentor-booked');
+  const bookingEl = document.getElementById('mentor-booking');
+  if (bookedEl) bookedEl.style.display = '';
+  if (bookingEl) bookingEl.style.display = 'none';
+  const d = document.getElementById('mentor-session-details');
+  if (d) d.innerHTML =
+    '<div class="mentor-session-row"><span class="mentor-session-label">Status</span><span class="mentor-session-value" style="color:var(--green)">✅ Confirmed</span></div>' +
+    '<div class="mentor-session-row"><span class="mentor-session-label">Amount Paid</span><span class="mentor-session-value">₹' + session.amount + '</span></div>' +
+    '<div class="mentor-session-row"><span class="mentor-session-label">Payment ID</span><span class="mentor-session-value" style="font-size:11px">' + session.payment_id + '</span></div>' +
+    '<div class="mentor-session-row"><span class="mentor-session-label">Booked On</span><span class="mentor-session-value">' + new Date(session.created_at).toLocaleDateString() + '</span></div>';
+}
+
+async function loadMentorPage() {
+  const bookedEl = document.getElementById('mentor-booked');
+  const bookingEl = document.getElementById('mentor-booking');
+
+  // Show cached session instantly if available
+  if (appState.mentorSession) {
+    renderMentorSession(appState.mentorSession);
+    return;
+  }
+
+  // Default: show booking form while loading
+  if (bookedEl) bookedEl.style.display = 'none';
+  if (bookingEl) bookingEl.style.display = '';
+
+  try {
+    const session = await api.getMentorSession();
+    if (session && session.status === 'paid') {
+      appState.mentorSession = session;
+      renderMentorSession(session);
+    }
+  } catch(e) { /* show booking form */ }
+}
+
+async function startMentorPayment() {
+  const goal = document.getElementById('mentor-goal').value;
+  const time = document.getElementById('mentor-time').value;
+  const notes = document.getElementById('mentor-notes').value;
+
+  if (!goal) { toast('Please select a goal first', 'error'); return; }
+
+  const btn = document.getElementById('mentor-pay-btn');
+  btn.disabled = true; btn.textContent = 'Processing...';
+
+  try {
+    const order = await api.createMentorOrder();
+
+    // Check if Razorpay is available and keys are set
+    const rzpKey = 'RAZORPAY_KEY_ID_HERE'; // ← Replace with your rzp_live_ key
+    if (!window.Razorpay || rzpKey === 'RAZORPAY_KEY_ID_HERE') {
+      // Demo mode — simulate payment success
+      await simulateMentorPayment(order, { goal, time, notes });
+      return;
+    }
+
+    const options = {
+      key: rzpKey,
+      amount: order.amount,
+      currency: order.currency,
+      name: 'SkillForge AI Mentorship',
+      description: '1-on-1 Career Mentorship Session',
+      order_id: order.orderId,
+      prefill: {
+        name: appState.profile?.full_name || '',
+        email: appState.user?.email || ''
+      },
+      theme: { color: '#7c3aed' },
+      handler: async function(response) {
+        try {
+          await api.verifyMentorPayment({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            preferences: { goal, time, notes }
+          });
+          toast('🎉 Session booked! A mentor will contact you within 24 hours.', 'success');
+          appState.mentorSession = null; loadMentorPage();
+        } catch(err) {
+          toast('Payment verification failed. Please contact support.', 'error');
+          btn.disabled = false; btn.textContent = '💳 Book Session — ₹500';
+        }
+      },
+      modal: {
+        ondismiss: function() {
+          btn.disabled = false;
+          btn.textContent = '💳 Book Session — ₹500';
+        }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+    // Reset button after portal opens
+    btn.disabled = false;
+    btn.textContent = '💳 Book Session — ₹500';
+
+  } catch(err) {
+    toast(err.message || 'Could not initiate payment', 'error');
+    btn.disabled = false;
+    btn.textContent = '💳 Book Session — ₹500';
+  }
+}
+
+async function simulateMentorPayment(order, preferences) {
+  const btn = document.getElementById('mentor-pay-btn');
+
+  // Show demo payment modal
+  const overlay = document.createElement('div');
+  overlay.id = 'demo-payment-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML =
+    '<div style="background:var(--bg2);border-radius:16px;padding:32px;max-width:380px;width:90%;text-align:center">' +
+    '<div style="font-size:40px;margin-bottom:12px">🔐</div>' +
+    '<h3 style="font-family:var(--font-display);margin-bottom:8px">Demo Payment</h3>' +
+    '<p class="text-sm text-muted" style="margin-bottom:20px;line-height:1.6">Razorpay is in test mode. Click below to simulate a successful payment and see the full booking flow.</p>' +
+    '<div style="background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:20px;text-align:left">' +
+    '<div style="font-size:13px;color:var(--text3);margin-bottom:4px">Amount</div>' +
+    '<div style="font-size:24px;font-weight:700;color:var(--accent)">₹500</div>' +
+    '</div>' +
+    '<button id="demo-pay-confirm" class="btn btn-primary btn-full" style="margin-bottom:10px">✅ Simulate Successful Payment</button>' +
+    '<button id="demo-pay-cancel" class="btn btn-ghost btn-full">Cancel</button>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  document.getElementById('demo-pay-cancel').onclick = () => {
+    overlay.remove();
+    btn.disabled = false;
+    btn.textContent = '💳 Book Session — ₹500';
+  };
+
+  document.getElementById('demo-pay-confirm').onclick = async () => {
+    document.getElementById('demo-pay-confirm').textContent = 'Booking...';
+    document.getElementById('demo-pay-confirm').disabled = true;
+    try {
+      // Call verify with demo data
+      await api.verifyMentorPayment({
+        razorpay_order_id: order.orderId,
+        razorpay_payment_id: 'demo_pay_' + Date.now(),
+        razorpay_signature: 'demo_signature',
+        preferences,
+        demo: true
+      });
+      overlay.remove();
+      toast('🎉 Session booked! A mentor will contact you within 24 hours.', 'success');
+      loadMentorPage();
+    } catch(err) {
+      overlay.remove();
+      toast('Booking failed: ' + err.message, 'error');
+      btn.disabled = false;
+      btn.textContent = '💳 Book Session — ₹500';
+    }
+  };
+}
+
+window.loadMentorPage = loadMentorPage;
+window.startMentorPayment = startMentorPayment;
+window.simulateMentorPayment = simulateMentorPayment;
+
+// ─── PROFILE TRANSACTIONS ─────────────────────────────────────────────────────
 async function loadProfileTransactions() {
   try {
     const sessions = await api.getMentorSessions();
