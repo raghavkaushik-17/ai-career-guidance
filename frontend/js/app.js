@@ -2114,7 +2114,7 @@ const footerContent = {
 <h4 style="color:#f0f0f8;margin:16px 0 8px">Data storage</h4>
 <p>Data is stored securely in Supabase with row-level security. Only you can access your own data. Payments are handled by Razorpay and we do not store card details.</p>
 <h4 style="color:#f0f0f8;margin:16px 0 8px">Your rights</h4>
-<p>You can delete your account and all associated data at any time by contacting us at support@skillforgeai.com.</p>
+<p>You can delete your account and all associated data at any time by contacting us at support<span>@</span>skillforgeai.com.</p>
 <p style="margin-top:16px;font-size:12px">Last updated: March 2026</p>`
   },
   terms: {
@@ -2131,20 +2131,12 @@ const footerContent = {
   },
   contact: {
     title: 'Contact Us',
-    body: `<h4 style="color:#f0f0f8;margin-bottom:8px">Get in touch</h4>
-<p>Have questions or feedback? We'd love to hear from you. Our team typically responds within 24–48 hours.</p>
-<div style="margin:20px 0;padding:16px;background:var(--bg3);border-radius:12px;border:1px solid var(--border2)">
-  <div style="margin-bottom:12px">
-    <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Support Email</div>
-    <a href="mailto:support@skillforgeai.com" style="color:var(--accent2);text-decoration:none;font-weight:600">support@skillforgeai.com</a>
-  </div>
-  <div>
-    <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Business Inquiries</div>
-    <a href="mailto:hello@skillforgeai.com" style="color:var(--accent2);text-decoration:none;font-weight:600">hello@skillforgeai.com</a>
-  </div>
-</div>
-<h4 style="color:#f0f0f8;margin:16px 0 8px">Office Location</h4>
-<p>SkillForge AI, Inc.<br>123 Innovation Way, Tech Park<br>Bangalore, KA 560001, India</p>`
+    body: `<h4 style="color:#f0f0f8;margin-bottom:12px">Get in touch</h4>
+<p style="margin-bottom:20px">Have questions or feedback? Feel free to reach out directly via email:</p>
+<div style="padding:20px;background:var(--bg3);border-radius:12px;border:1px solid var(--border2);text-align:center">
+  <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Email Address</div>
+  <a href="mailto:raghavkaushik199883@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:700;font-size:18px">raghavkaushik199883<span>@</span>gmail.com</a>
+</div>`
   }
 };
 
