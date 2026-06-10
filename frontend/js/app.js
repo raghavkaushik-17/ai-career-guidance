@@ -2135,7 +2135,7 @@ const footerContent = {
 <p style="margin-bottom:20px">Have questions or feedback? Feel free to reach out directly via email:</p>
 <div style="padding:20px;background:var(--bg3);border-radius:12px;border:1px solid var(--border2);text-align:center">
   <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Email Address</div>
-  <a href="mailto:raghavkaushik199883@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:700;font-size:18px">raghavkaushik199883<span>@</span>gmail.com</a>
+  <a href="mailto:raghavkaushik1983@gmail.com" style="color:var(--accent2);text-decoration:none;font-weight:700;font-size:18px">raghavkaushik1983<span>@</span>gmail.com</a>
 </div>`
   }
 };
