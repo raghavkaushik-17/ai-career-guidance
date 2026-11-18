@@ -5,6 +5,29 @@ const supabase = require('../supabase');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+const FALLBACK_MODELS = [
+  process.env.GROQ_MODEL,
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
+  'qwen/qwen3.8-27b'
+].filter(Boolean);
+
+async function callGroqWithFallback(params) {
+  let lastError;
+  for (const model of FALLBACK_MODELS) {
+    try {
+      return await groq.chat.completions.create({
+        ...params,
+        model
+      });
+    } catch (err) {
+      console.warn(`[Groq] Model ${model} failed: ${err.message}. Trying next fallback...`);
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
 // GET /api/skills - all available skills
 router.get('/', async (req, res) => {
   const { data, error } = await supabase
@@ -84,11 +107,13 @@ router.post('/gap-analysis', async (req, res) => {
       .from('user_skills')
       .select('skills(name, category), proficiency')
       .eq('user_id', userId);
-    currentSkills = (userSkills || []).map(us => ({
-      name: us.skills.name,
-      category: us.skills.category,
-      proficiency: us.proficiency || 'intermediate'
-    }));
+    currentSkills = (userSkills || [])
+      .filter(us => us.skills && us.skills.name)
+      .map(us => ({
+        name: us.skills.name,
+        category: us.skills.category || 'general',
+        proficiency: us.proficiency || 'intermediate'
+      }));
   }
 
   const skillsList = currentSkills.length > 0
@@ -120,10 +145,10 @@ router.post('/gap-analysis', async (req, res) => {
 
   const attemptAnalysis = async (attempt = 1) => {
     try {
-      return await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+      return await callGroqWithFallback({
         max_completion_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' }
       });
     } catch(e) {
       if (attempt < 2) { await new Promise(r => setTimeout(r, 1000)); return attemptAnalysis(attempt + 1); }
@@ -135,39 +160,44 @@ router.post('/gap-analysis', async (req, res) => {
     const response = await attemptAnalysis();
 
     const rawText = response.choices[0].message.content;
-let analysis;
+    let analysis;
 
-try {
-  analysis = JSON.parse(rawText);
-} catch {
-  try {
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      let cleaned = jsonMatch[0];
+    try {
+      analysis = JSON.parse(rawText);
+    } catch {
+      try {
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          let cleaned = jsonMatch[0];
 
-      // Fix unquoted summary (common issue)
-      cleaned = cleaned.replace(
-        /"summary":\s*([^",\n]+)(?=,)/,
-        (m, p1) => `"summary": "${p1.trim()}"`
-      );
+          // Fix unquoted summary (common issue)
+          cleaned = cleaned.replace(
+            /"summary":\s*([^",\n]+)(?=,)/,
+            (m, p1) => `"summary": "${p1.trim()}"`
+          );
 
-      analysis = JSON.parse(cleaned);
-    } else {
-      throw new Error("No JSON found");
+          analysis = JSON.parse(cleaned);
+        } else {
+          throw new Error("No JSON found");
+        }
+      } catch (e) {
+        console.error("JSON parse fallback failed:", rawText);
+        analysis = {
+          summary: rawText,
+          match_score: 50,
+          missing_skills: [],
+          recommendations: []
+        };
+      }
     }
-  } catch (e) {
-    console.error("JSON parse fallback failed:", rawText);
-    analysis = {
-      summary: rawText,
-      match_score: 50,
-      missing_skills: [],
-      recommendations: []
-    };
-  }
-}
 
-    // Ensure match_score is a number
+    // Ensure match_score is a number & fields are valid
     analysis.match_score = parseInt(analysis.match_score) || 50;
+    analysis.missing_skills = Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
+    analysis.strengths = Array.isArray(analysis.strengths) ? analysis.strengths : [];
+    analysis.recommendations = Array.isArray(analysis.recommendations) ? analysis.recommendations : [];
+    analysis.roadmap = typeof analysis.roadmap === 'string' ? analysis.roadmap : '';
+    analysis.summary = typeof analysis.summary === 'string' ? analysis.summary : '';
 
     // Save to DB
     const { data: saved, error: saveError } = await supabase
@@ -237,15 +267,18 @@ Respond ONLY with valid JSON, no markdown, no backticks:
 Include 6-10 technical skills, 3-5 soft skills, 3-6 tools/platforms specific to this role.`;
 
   try {
-    const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+    const response = await callGroqWithFallback({
       max_completion_tokens: 500,
-      messages: [{ role: 'user', content: prompt }]
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: 'json_object' }
     });
     const raw = response.choices[0].message.content;
     let skills;
     try { skills = JSON.parse(raw); }
     catch { const m = raw.match(/\{[\s\S]*\}/); skills = m ? JSON.parse(m[0]) : { technical: [], soft: [], tools: [] }; }
+    skills.technical = Array.isArray(skills?.technical) ? skills.technical : [];
+    skills.soft = Array.isArray(skills?.soft) ? skills.soft : [];
+    skills.tools = Array.isArray(skills?.tools) ? skills.tools : [];
     res.json(skills);
   } catch (err) {
     const msg = err?.error?.message || err?.message || String(err);

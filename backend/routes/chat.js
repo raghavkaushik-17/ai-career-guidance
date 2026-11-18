@@ -5,6 +5,29 @@ const supabase = require('../supabase');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+const FALLBACK_MODELS = [
+  process.env.GROQ_MODEL,
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
+  'qwen/qwen3.8-27b'
+].filter(Boolean);
+
+async function callGroqWithFallback(params) {
+  let lastError;
+  for (const model of FALLBACK_MODELS) {
+    try {
+      return await groq.chat.completions.create({
+        ...params,
+        model
+      });
+    } catch (err) {
+      console.warn(`[Groq] Model ${model} failed: ${err.message}. Trying next fallback...`);
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
 const SYSTEM_PROMPT = `You are SkillForge AI, an expert career guidance advisor. You help people at all career stages:
 - Students and fresh graduates finding their first role
 - Mid-career professionals leveling up or pivoting
@@ -113,9 +136,8 @@ router.post('/sessions/:id/message', async (req, res) => {
     // Save user message
     await supabase.from('chat_messages').insert({ session_id: sessionId, role: 'user', content });
 
-    // Call Groq
-    const aiResponse = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+    // Call Groq with fallback models
+    const aiResponse = await callGroqWithFallback({
       max_tokens: 1000,
       messages: [
         { role: 'system', content: systemPrompt },
